@@ -1,17 +1,19 @@
 import cv2
 import pytesseract
 import numpy as np
+
 import craft_text_detector as craft_detector
-import scan_floodfill
-from font_bin_poo import fontBin 
+from text_binarization import textBin 
+
 from PIL import ImageGrab
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
-from googletrans import Translator
-from swtloc import SWTLocalizer
 
-pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
+from googletrans import Translator
+
+
+pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
 tra =Translator()
 
 def text_wrap(text, font, max_width):
@@ -40,9 +42,6 @@ def text_wrap(text, font, max_width):
     return lines
 
 
-###########################################
-#Return a mask with a text detection
-###########################################
 def detect_text(img):
     width=img.shape[0]
     height=img.shape[1]
@@ -67,26 +66,20 @@ def detect_text(img):
         cv2.rectangle(blank_image, point1, point2, (255, 255, 255), -1)
 
     return blank_image
-###########################################
-#Return a mask with a paragraph detection
-###########################################
-def detect_paragraph(img_in,mask_in):
-    # cv2.imshow('mask',mask_in)
-    # cv2.waitKey(0)
 
+
+def detect_paragraph(img_in,mask_in):
     par_list=[]
-    crop=[]
     img=img_in.copy()
     img2gray = cv2.cvtColor(mask_in, cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(img2gray, 180, 255, cv2.THRESH_BINARY)
     image_final = cv2.bitwise_and(img2gray, img2gray, mask=mask)
-    ret, new_img = cv2.threshold(image_final, 180, 255, cv2.THRESH_BINARY)  # for black text , cv.THRESH_BINARY_INV
+    ret, new_img = cv2.threshold(image_final, 180, 255, cv2.THRESH_BINARY)
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,
-                                                         3))  # to manipulate the orientation of dilution , large x means horizonatally dilating  more, large y means vertically dilating more
-    dilated = cv2.dilate(new_img, kernel, iterations=9)  # dilate , more the iteration more the dilation
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))  
+    dilated = cv2.dilate(new_img, kernel, iterations=9) 
 
-    # for cv3.x.x comment above line and uncomment line below
+  
 
     contours, hierarchy = cv2.findContours(dilated,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
@@ -94,17 +87,13 @@ def detect_paragraph(img_in,mask_in):
     mask=mask_in.copy()
     i=0
     for contour in contours:
-        # get rectangle bounding contour
+
         [x, y, w, h] = cv2.boundingRect(contour)
         cropped=img[y :y +  h , x : x + w]
-        # mask=cv2.cvtColor(mask[y:y+h,x:x+w],cv2.COLOR_BGR2GRAY)
-
 
         cropped=cv2.bitwise_and(cropped,mask_in[y :y +  h , x : x + w])
-        cv2.imwrite('par2/'+str(i)+'.jpg',cropped)
-        i+=1
 
-        binary=fontBin(cropped)
+        binary=textBin(cropped)
         cropped=binary.processing()
         par_list.append({
             'image':cropped,
@@ -116,9 +105,7 @@ def detect_paragraph(img_in,mask_in):
     
     return par_list
 
-###########################################
-#Get text in img_in
-###########################################
+
 def get_text(img_in):
     boxes = pytesseract.image_to_data(img_in)
     string=''
@@ -144,9 +131,8 @@ def get_text(img_in):
         'h':h,
         'string':string
     }
-###########################################
-#Translate text in img_in
-###########################################   
+
+
 def translate_text(img_in,string,par,width):
     x=string['x'] + par['x']-45
     y=string['y'] + par['y']-20
@@ -170,14 +156,10 @@ def translate_text(img_in,string,par,width):
     return img_in
 
 
-img = cv2.imread('69.jpg')
-
-
+img = cv2.imread('exemple.jpg')
 
 mask=detect_text(img)
-# cv2.imshow('mask',mask)
-# cv2.waitKey(0)
-i=0
+
 par_list=detect_paragraph(img,mask)
 for par in par_list:
     x=par['x']
@@ -189,13 +171,10 @@ for par in par_list:
     if text['string'] !='':
         cv2.rectangle(img, (x,y), (x+w, y+h), (255, 255,255), -1)
         img=translate_text(img,text,par,w)
-    cv2.imwrite('par3/'+str(i)+'.jpg',par['image'])
-    i+=1
 
-cv2.imwrite('out1.jpg',img)
+cv2.imwrite('out.jpg',img)
 
 
-print('t')
 ###########################################
 # Translate
 ###########################################

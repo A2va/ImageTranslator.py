@@ -4,7 +4,7 @@ import numpy as np
 DEBUG=0
 MAXBLOCKSIZE = 3000
 
-class fontBin():
+class textBin():
 
     def __init__(self,img):
         self.orig_img=img
