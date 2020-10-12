@@ -250,7 +250,6 @@ class textBin():
 
         # blur a bit to improve ocr accuracy
         new_image = cv2.blur(new_image, (2, 2))
-        cv2.imwrite('font.jpg', new_image)
         if DEBUG:
             cv2.imwrite('edges.png', edges)
             cv2.imwrite('processed.png', processed)

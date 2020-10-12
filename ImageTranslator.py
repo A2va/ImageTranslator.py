@@ -12,63 +12,72 @@ from PIL import ImageDraw
 
 from googletrans import Translator
 
-from urllib.request import urlretrieve
-
+import urllib
 
 pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
 tra =Translator()
 
 class ImageTranslator():
-    """The main class of the tranlsator 
+    """
+    The main class of the translator 
     
     Args: img This can be file,bytes or URL
+        ocr: 'EasyOCR' or 'Tesseract'
     """
-    def __init__(self,img):
+    def __init__(self,img,ocr):
 
         self.img= self.__reformat_input(img)
-        self.img_out=img.copy()
-        self.paragraph=[]
+        self.img_out=self.img.copy()
         self.text=[]
         self.mask_paragraph=None
+        self.ocr=ocr
 
     def processing(self):
-        self.detect_text()
-        self.detect_paragraph()
+        self.mask_paragraph=self.__detect_text()
+        paragraphs=self.__detect_paragraph()
+        #Apply Binarization and ocr
+        for paragraph in paragraphs:
+            binary=textBin(paragraph['image'])
+            paragraph['image']=binary.processing()
 
-        for paragraph in self.paragraph:
-            x=paragraph['x']
-            y=paragraph['y']
-            w=paragraph['w']
-            h=paragraph['h']
-            text =self.__run_tesserract(paragraph['image'])
+            self.text.append(self.__run_ocr(paragraph))
 
-            if text['string'] !='':
+        for i in range(0,len(self.text)):
+            x=self.text[i]['x']
+            y=self.text[i]['y']
+            w=self.text[i]['w']
+            h=self.text[i]['h']
+            if self.text[i]['string'] !='':
                 cv2.rectangle(self.img_out, (x,y), (x+w, y+h), (255, 255,255), -1)
-                self.__translate_text(text,par,w)
-                self.__apply_translation()
+                self.text[i]=self.__translate_text(self.text[i])
+                self.__apply_translation(self.text[i])
+
 
     def __detect_text(self):
         """
         Return a mask from the text location
         """
-        blank_image = np.zeros((self.img.shape[0],self.img.shape[1],1), np.uint8)
+        blank_image = np.zeros((self.img.shape[0],self.img.shape[1],3), np.uint8)
         prediction_result=self.__craft(self.img)
         boxes=prediction_result['boxes']
 
         for box in boxes:
             point1=tuple(box[0])
             point2=tuple(box[2])
-            cv2.rectangle(blank_image, point1, point2, 255, -1)
+            cv2.rectangle(blank_image, point1, point2, (255,255,255), -1)
 
-        self.mask_paragraph=blank_image
+        return blank_image
 
     def __detect_paragraph(self):
-        par_list=[]
-        img=img_in.copy()
+        """
+        Return a dict with cropped paragraph and location
+        """
+        paragraph=[]
+        img=self.img.copy()
 
         #Find contours
         kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))  
-        dilated = cv2.dilate(self.mask_paragraph, kernel, iterations=9) 
+        dilated = cv2.dilate(cv2.cvtColor(self.mask_paragraph,cv2.COLOR_BGR2GRAY), kernel, iterations=9) 
         contours, hierarchy = cv2.findContours(dilated,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
         for contour in contours:
@@ -79,18 +88,29 @@ class ImageTranslator():
             cropped=cv2.bitwise_and(cropped,self.mask_paragraph[y :y +  h , x : x + w])
 
             #Apply binarization
-            binary=textBin(cropped)
-            cropped=binary.processing()
-            self.paragraph.append({
+            paragraph.append({
                 'image':cropped,
                 'x':x,
                 'y':y,
                 'w':w,
                 'h':h
             })
+            return paragraph
         
-    def __run_tesserract(self,img):
-        boxes = pytesseract.image_to_data(img)
+    def __run_ocr(self,paragraph):
+        """
+        Run OCR between Tesseract and EasyOCR
+        """
+        if self.ocr=='EasyOCR':
+            return self.__run_easyocr(paragraph)
+        elif self.ocr=='Tesseract':
+            return self.__run_tesserract(paragraph)
+
+    def __run_tesserract(self,paragraph):
+        """
+        Run tesseract OCR
+        """
+        boxes = pytesseract.image_to_data(paragraph['image'])
         string=''
         x,y,w,h=(0,0,0,0)
         first=True
@@ -106,15 +126,20 @@ class ImageTranslator():
                         first=False
                     string=string +str(b[11])+' '
         return {
-            'x':x,
-            'y':y,
-            'w':w,
-            'h':h,
-            'string':string
-        }
-    def __run_easyocr(self,img):
+                'x':x+paragraph['x']-45,
+                'y':y+paragraph['y']-20,
+                'w':w,
+                'h':h,
+                'string':string,
+                'image': paragraph['image'],
+                'max_width':paragraph['w']
+                }
+    def __run_easyocr(self,paragraph):
+        """
+        Run EasyOCR
+        """
         reader = easyocr.Reader(['en'])
-        result = reader.readtext(img)
+        result = reader.readtext(paragraph['image'])
         #1|----------------------------|2
         # |                            |
         #4|----------------------------|3
@@ -127,16 +152,19 @@ class ImageTranslator():
         for res in result:
             string+=res[1]
         return {
-            'x':x,
-            'y':y,
+            'x':x+paragraph['x']-45,
+            'y':y+paragraph['y']-20,
             'w':w,
             'h':h,
-            'string':string
+            'string':string,
+            'image':paragraph['image'],
+            'max_width':paragraph['w']
+
         }
 
     def __craft(self,img):
         """
-        Return the text location
+        Return a predication of text location
         """
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -166,11 +194,11 @@ class ImageTranslator():
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         elif type(image) == np.ndarray:
-            if len(image.shape) == 2: # grayscale
+            if len(image.shape) == 2: 
                 img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-            elif len(image.shape) == 3 and image.shape[2] == 3: # BGRscale
+            elif len(image.shape) == 3 and image.shape[2] == 3:
                 img = image
-            elif len(image.shape) == 3 and image.shape[2] == 4: # RGBAscale
+            elif len(image.shape) == 3 and image.shape[2] == 4:
                 img = image[:,:,:3]
                 img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         else:
@@ -178,6 +206,9 @@ class ImageTranslator():
         return img
 
     def __text_wrap(text, font, max_width):
+        """
+        Wrap the into multiple lines
+        """
         lines = []
         # If the width of the text is smaller than image width
         # we don't need to split it, just add it to the lines array
@@ -202,24 +233,20 @@ class ImageTranslator():
                 lines.append(line)    
         return lines
 
-    def __translate_text(self,paragraph):
-        x=string['x'] + paragraph['x']-45
-        y=string['y'] + paragraph['y']-20
-        w=string['w']
-        h=string['h']
-        string_str= tra.translate(string['string'],dest='fr').text
+    def __translate_text(self,text):
+        """
+        Translate the text
+        """
+        string= tra.translate(text['string'],dest='fr').text
 
-        self.text.append({
-            'text':string['string'],
-            'translate':string_str,
-            'x':x,
-            'y':y,
-            'w':w,
-            'h':h,
-            'max_width':paragraph['w']
-        })
+        text['translated_string']=string
+        return text
     
-    def __apply_translation(self,max_width):
+    def __apply_translation(self,text):
+        """
+        Apply the translation on img_out
+        """
+
         im_pil = Image.fromarray(self.img_out)
         draw = ImageDraw.Draw(im_pil)
 
@@ -227,154 +254,15 @@ class ImageTranslator():
         font_size=int(h*1.1)
         font = ImageFont.truetype(font_file_path, size=font_size, encoding="unic")
 
-        for tt in self.text:
-            lines = text_wrap(tt['translate'], font,max_width)
-            line_height = font.getsize('hg')[1]
-            for line in lines:
-                draw.text((x, y), line, fill=(0,0,0), font=font)
-                y = y + line_height
-
-            self.img_out = np.asarray(im_pil)
+        lines = text_wrap(text['translated_string'], font,text['max_width'])
+        line_height = font.getsize('hg')[1]
+        for line in lines:
+            draw.text((text['x'], text['y']), line, fill=(0,0,0), font=font)
+            y = y + line_height
+        self.img_out = np.asarray(im_pil)
 
 
 
-
-def detect_text(img):
-    width=img.shape[0]
-    height=img.shape[1]
-    blank_image = np.zeros((width,height,3), np.uint8)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-    if img.shape[0] == 2:
-        img = img[0]
-    if img.shape[2] == 4:
-        img = img[:, :, :3]
-
-    refine_net= craft_detector.load_refinenet_model(cuda=False)
-    craft_net = craft_detector.load_craftnet_model(cuda=False)
-    prediction_result = craft_detector.get_prediction(image=img,craft_net=craft_net,
-    refine_net=refine_net,text_threshold=0.7,link_threshold=0.4,low_text=0.4,cuda=False,
-    long_size=1280)  
-    boxes=prediction_result['boxes']
-
-    for box in boxes:
-        point1=tuple(box[0])
-        point2=tuple(box[2])
-        cv2.rectangle(blank_image, point1, point2, (255, 255, 255), -1)
-
-    return blank_image
-
-
-def detect_paragraph(img_in,mask_in):
-    par_list=[]
-    img=img_in.copy()
-    img2gray = cv2.cvtColor(mask_in, cv2.COLOR_BGR2GRAY)
-    ret, mask = cv2.threshold(img2gray, 180, 255, cv2.THRESH_BINARY)
-    image_final = cv2.bitwise_and(img2gray, img2gray, mask=mask)
-    ret, new_img = cv2.threshold(image_final, 180, 255, cv2.THRESH_BINARY)
-
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))  
-    dilated = cv2.dilate(new_img, kernel, iterations=9) 
-
-  
-
-    contours, hierarchy = cv2.findContours(dilated,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-
-    i=0
-    mask=mask_in.copy()
-    i=0
-    for contour in contours:
-
-        [x, y, w, h] = cv2.boundingRect(contour)
-        cropped=img[y :y +  h , x : x + w]
-
-        cropped=cv2.bitwise_and(cropped,mask_in[y :y +  h , x : x + w])
-
-        binary=textBin(cropped)
-        cropped=binary.processing()
-        par_list.append({
-            'image':cropped,
-            'x':x,
-            'y':y,
-            'w':w,
-            'h':h
-        })
-    
-    return par_list
-
-
-def get_text(img_in):
-    boxes = pytesseract.image_to_data(img_in)
-    string=''
-    compare_y=0
-    compare_y_old=0
-    x,y,w,h=(0,0,0,0)
-    first=True
-    for a,b in enumerate(boxes.splitlines()):
-        if a!=0:
-            b = b.split()
-            if len(b)==12: 
-                if first== True:
-                    x=int(b[6])
-                    y=int(b[7])
-                    w =int(b[8])
-                    h =int(b[9])
-                    first=False
-                string=string +str(b[11])+' '
-    return {
-        'x':x,
-        'y':y,
-        'w':w,
-        'h':h,
-        'string':string
-    }
-
-
-def translate_text(img_in,string,par,width):
-    x=string['x'] + par['x']-45
-    y=string['y'] + par['y']-20
-    w=string['w']
-    h=string['h']
-    font_size=int(h*1.1)
-    im_pil = Image.fromarray(img_in)
-    draw = ImageDraw.Draw(im_pil)
-
-    string= tra.translate(string['string'],dest='fr').text
-    font_file_path = 'Cantarell-Regular.ttf'
-    font = ImageFont.truetype(font_file_path, size=font_size, encoding="unic")
-
-    lines = text_wrap(string, font,width)
-    line_height = font.getsize('hg')[1]
-    for line in lines:
-        draw.text((x, y), line, fill=(0,0,0), font=font)
-        
-        y = y + line_height
-    img_in = np.asarray(im_pil)
-    return img_in
-
-
-img = cv2.imread('exemple.jpg')
-
-mask=detect_text(img)
-
-par_list=detect_paragraph(img,mask)
-for par in par_list:
-    x=par['x']
-    y=par['y']
-    w=par['w']
-    h=par['h']
-    text =get_text(par['image'])
-
-    if text['string'] !='':
-        cv2.rectangle(img, (x,y), (x+w, y+h), (255, 255,255), -1)
-        img=translate_text(img,text,par,w)
-
-cv2.imwrite('out.jpg',img)
-
-
-###########################################
-# Translate
-###########################################
-
-
+test=ImageTranslator('https://i.stack.imgur.com/vrkIj.png','Tesseract')
+test.processing()
 
