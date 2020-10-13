@@ -17,6 +17,127 @@ import urllib
 pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
 tra =Translator()
 
+TESSERACT_LANG=[
+    'afr',#Afrikaans
+    'amh',#Amharic
+    'ara',#Arabic
+    'asm',#Assamese
+    'aze',#Azerbaijani,
+    'aze_cyrl',
+    'bel',#Belarusian
+    'ben',#Bengali
+    'bod',#Tibetan
+    'bul',#Bulgarian
+    'cat',#Catalan
+    'ceb',#Cebuano 
+    'ces',#Czech
+    'chi_sim',#Chinese
+    'chi_sim_vert',
+    'chi_tra_vert',
+    'chr',#Cherokee
+    'cos',#Corsican
+    'sim',#Mende (Papua New Guinea)
+    'dan',#Danish
+    'deu'#German
+    'div',#Divehi
+    'dzo',#Dzongkha
+    'ell',#Mordern Greek
+    'eng',#English
+    'enm',#Middle English
+    'est'#Estonian
+    'eus',#Basque
+    'fao',#Faroese
+    'fas',#Persian
+    'fin',#Finnish
+    'fra',#French
+    'frk',# Frankish 
+    'frm',#Middle French
+    'fry',#Western Frisian
+    'gla',#Scottish Gaelic
+    'gle',#Irish
+    'glg',#Galician
+    'grc',#Ancient Greek
+    'quj',#Gujuarati
+    'hat',#Haitian
+    'heb',#Hebrew
+    'hin',#Hindi
+    'hrv',#Croatian
+    'hun',#Hungarian
+    'hye',#Armenian
+    'iku',#Inuktitut 
+    'ind',#Indonesian
+    'isl',#Icelandic
+    'ita',#Italian
+    'ita_old',#
+    'jav',#Javanese
+    'jpn',#Japanese
+    'jpn_vert',#
+    'kan',#Kannada
+    'kat',#Georgian
+    'kat_old',#
+    'kaz',#Kazakh
+    'khm',#Khmer
+    'kir',#Kirghiz 
+    'kmr',#Northern Kurdish
+    'kor',#Korean
+    'kor_vert',#
+    'lao',#Lao
+    'lat',#Latin
+    'lav',#Latvian
+    'lit',#Lithuanian 
+    'ltz',# Luxembourgish 
+    'mal',#Malayalam 
+    'mar',#Marathi 
+    'mkd',# Macedonian 
+    'mlt',#Maltese 
+    'mon',#Mongolian 
+    'mri',#Maori 
+    'msa',#Malay 
+    'mya',# Burmese 
+    'nep',# Nepali 
+    'nld',#Dutch
+    'nor',#Norvegian
+    'oci',#Occitan 
+    'ori',#Oriya 
+    'pan',#Panjabi 
+    'pol',#Polish 
+    'por',#Portuguese 
+    'pus',#Pushto 
+    'que',#Quechua 
+    'ron',#Romanian 
+    'rus',#Russian
+    'san',#Sanskrit 
+    'sin',#Sinhala 
+    'slk',#Slovak 
+    'slv',#Slovenian 
+    'snd',#Sindhi 
+    'spa',#Spanish 
+    'spa_old',
+    'sqi',#Albanian 
+    'srp',#Serbian 
+    'srp_latn',
+    'sun',#Sundanese 
+    'swa',# Swahili 
+    'swe',#Swedish
+    'syr',#Syriac 
+    'tam',#Tamil
+    'tat',#Tatar
+    'tel',#Telugu
+    'tgk',#Tajiik
+    'tha',#Thai 
+    'tir',#Tigrinya 
+    'ton',#Tonga 
+    'tur',#Turkish 
+    'uig',#Uighur 
+    'ukr',#Ukrainian 
+    'urd',#Urdu
+    'urb',#Urubú-Kaapor
+    'uzb_cyrl',
+    'vie',# Vietnamese 
+    'yid',#Yiddish 
+    'yor'#Yoruba 
+    ]
+
 class ImageTranslator():
     """
     The main class of the translator 
@@ -33,7 +154,7 @@ class ImageTranslator():
         self.ocr=ocr
 
     def processing(self):
-        self.mask_paragraph=self.__detect_text()
+        self.mask_paragraph=self.__detect_text(self.img)
         paragraphs=self.__detect_paragraph()
         #Apply Binarization and ocr
         for paragraph in paragraphs:
@@ -53,12 +174,12 @@ class ImageTranslator():
                 self.__apply_translation(self.text[i])
 
 
-    def __detect_text(self):
+    def __detect_text(self,img):
         """
         Return a mask from the text location
         """
-        blank_image = np.zeros((self.img.shape[0],self.img.shape[1],3), np.uint8)
-        prediction_result=self.__craft(self.img)
+        blank_image = np.zeros((img.shape[0],img.shape[1],3), np.uint8)
+        prediction_result=self.__craft(img)
         boxes=prediction_result['boxes']
 
         for box in boxes:
