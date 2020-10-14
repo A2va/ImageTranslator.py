@@ -97,130 +97,130 @@ EASYOCR =[
     'uz',#Uzbek
     'vi'#Vietnamese 
 
-
-
 ]
 
-TESSERACT_LANG=[
-    'afr',#Afrikaans
-    'amh',#Amharic
-    'ara',#Arabic
-    'asm',#Assamese
-    'aze',#Azerbaijani,
-    'aze_cyrl',
-    'bel',#Belarusian
-    'ben',#Bengali
-    'bod',#Tibetan
-    'bul',#Bulgarian
-    'cat',#Catalan
-    'ceb',#Cebuano 
-    'ces',#Czech
-    'chi_sim',#Chinese
-    'chi_sim_vert',
-    'chi_tra_vert',
-    'chr',#Cherokee
-    'cos',#Corsican
-    'sim',#Mende (Papua New Guinea)
-    'dan',#Danish
-    'deu'#German
-    'div',#Divehi
-    'dzo',#Dzongkha
-    'ell',#Mordern Greek
-    'eng',#English
-    'enm',#Middle English
-    'est'#Estonian
-    'eus',#Basque
-    'fao',#Faroese
-    'fas',#Persian
-    'fin',#Finnish
-    'fra',#French
-    'frk',# Frankish 
-    'frm',#Middle French
-    'fry',#Western Frisian
-    'gla',#Scottish Gaelic
-    'gle',#Irish
-    'glg',#Galician
-    'grc',#Ancient Greek
-    'quj',#Gujuarati
-    'hat',#Haitian
-    'heb',#Hebrew
-    'hin',#Hindi
-    'hrv',#Croatian
-    'hun',#Hungarian
-    'hye',#Armenian
-    'iku',#Inuktitut 
-    'ind',#Indonesian
-    'isl',#Icelandic
-    'ita',#Italian
-    'ita_old',#
-    'jav',#Javanese
-    'jpn',#Japanese
-    'jpn_vert',#
-    'kan',#Kannada
-    'kat',#Georgian
-    'kat_old',#
-    'kaz',#Kazakh
-    'khm',#Khmer
-    'kir',#Kirghiz 
-    'kmr',#Northern Kurdish
-    'kor',#Korean
-    'kor_vert',#
-    'lao',#Lao
-    'lat',#Latin
-    'lav',#Latvian
-    'lit',#Lithuanian 
-    'ltz',# Luxembourgish 
-    'mal',#Malayalam 
-    'mar',#Marathi 
-    'mkd',# Macedonian 
-    'mlt',#Maltese 
-    'mon',#Mongolian 
-    'mri',#Maori 
-    'msa',#Malay 
-    'mya',# Burmese 
-    'nep',# Nepali 
-    'nld',#Dutch
-    'nor',#Norvegian
-    'oci',#Occitan 
-    'ori',#Oriya 
-    'pan',#Panjabi 
-    'pol',#Polish 
-    'por',#Portuguese 
-    'pus',#Pushto 
-    'que',#Quechua 
-    'ron',#Romanian 
-    'rus',#Russian
-    'san',#Sanskrit 
-    'sin',#Sinhala 
-    'slk',#Slovak 
-    'slv',#Slovenian 
-    'snd',#Sindhi 
-    'spa',#Spanish 
-    'spa_old',
-    'sqi',#Albanian 
-    'srp',#Serbian 
-    'srp_latn',
-    'sun',#Sundanese 
-    'swa',# Swahili 
-    'swe',#Swedish
-    'syr',#Syriac 
-    'tam',#Tamil
-    'tat',#Tatar
-    'tel',#Telugu
-    'tgk',#Tajiik
-    'tha',#Thai 
-    'tir',#Tigrinya 
-    'ton',#Tonga 
-    'tur',#Turkish 
-    'uig',#Uighur 
-    'ukr',#Ukrainian 
-    'urd',#Urdu
-    'urb',#Urubú-Kaapor
-    'uzb_cyrl',
-    'vie',# Vietnamese 
-    'yid',#Yiddish 
-    'yor'#Yoruba 
-    ]
+OCR_LANG={
+            #Tesseract #EasyOCR
+    'afr': ['afr']            #Afrikaans
+    'amh': ['amh']              #Amharic
+    'ara': ['ara']              #Arabic
+    'asm': ['asm']             #Assamese
+    'aze': ['aze']              #Azerbaijani
+    'aze_cyrl': ['aze_cyrl']         
+    'bel': ['bel']              #Belarusian
+    'ben': ['ben']              #Bengali
+    'bod': ['bod']              #Tibetan
+    'bul': ['bul']              #Bulgarian
+    'cat': ['cat']              #Catalan
+    'ceb': ['ceb']              #Cebuano 
+    'ces': ['ces']              #Czech
+    'chi_sim': ['chi_sim']           #Chinese
+    'chi_sim_vert': ['chi_sim_vert'] #Vertical Chinese
+    'chi_tra':['chi_tra']           #Traditional Chinese 
+    'chi_tra_vert': ['chi_tra_vert']#Traditional Chinese verctical 
+    'chr': ['chr']             #Cherokee
+    'cos': ['cos']             #Corsican
+    'sim': ['sim']             #Mende (Papua New Guinea)
+    'dan': ['dan']             #Danish
+    'deu': ['deu']             #German
+    'div': ['div']             #Divehi
+    'dzo': ['dzo']             #Dzongkha
+    'ell': ['ell']             #Mordern Greek
+    'eng': ['eng']            #English
+    'enm': ['enm']             #Middle English
+    'est': ['est']             #Estonian
+    'eus': ['eus']             #Basque
+    'fao': ['fao']             #Faroese
+    'fas': ['fas']             #Persian
+    'fin': ['fin']             #Finnish
+    'fra': ['fra']            #French
+    'frk': ['frk']             #Frankish 
+    'frm': ['frm']            #Middle French
+    'fry': ['fry']             #Western Frisian
+    'gla': ['gla']             #Scottish Gaelic
+    'gle': ['gle']             #Irish
+    'glg': ['glg']             #Galician
+    'grc': ['grc']             #Ancient Greek
+    'quj': ['quj']             #Gujuarati
+    'hat': ['hat']             #Haitian
+    'heb': ['heb']             #Hebrew
+    'hin': ['hin']             #Hindi
+    'hrv': ['hrv']             #Croatian
+    'hun': ['hun']             #Hungarian
+    'hye': ['hye']             #Armenian
+    'iku': ['iku']             #Inuktitut 
+    'ind': ['ind']             #Indonesian
+    'isl': ['isl']             #Icelandic
+    'ita': ['ita']             #Italian
+    'ita_old': ['ita_old']      #Old Italian
+    'jav': ['jav']              #Javanese
+    'jpn': ['jpn']              #Japanese
+    'jpn_vert': ['jpn_vert']    #Vertcial Japanese
+    'kan': ['kan']             #Kannada
+    'kat': ['kat']             #Georgian
+    'kat_old': ['kat_old']     #Old Georgian
+    'kaz': ['kaz']             #Kazakh
+    'khm': ['khm']             #Khmer
+    'kir': ['kir']             #Kirghiz 
+    'kmr': ['kmr']             #Northern Kurdish
+    'kor': ['kor']             #Korean
+    'kor_vert': ['kor_vert']   #Vertical Korean
+    'lao': ['lao']             #Lao
+    'lat': ['lat']             #Latin
+    'lav': ['lav']             #Latvian
+    'lit': ['lit']             #Lithuanian 
+    'ltz': ['ltz']            #Luxembourgish 
+    'mal': ['mal']             #Malayalam 
+    'mar': ['mar']             #Marathi 
+    'mkd': ['mlt']            #Macedonian 
+    'mlt': ['mlt']             #Maltese 
+    'mon': ['mon']            #Mongolian 
+    'mri': ['mri']             #Maori 
+    'msa': ['msa']             #Malay 
+    'mya': ['mya']             #Burmese 
+    'nep': ['nep']             #Nepali 
+    'nld': ['nld']             #Dutch
+    'nor': ['nor']             #Norvegian
+    'oci': ['oci']             #Occitan 
+    'ori': ['ori']             #Oriya 
+    'pan': ['pan']             #Panjabi 
+    'pol': ['pol']             #Polish 
+    'por': ['por']            #Portuguese 
+    'pus': ['pus']             #Pushto 
+    'que': ['que']             #Quechua 
+    'ron': ['ron']             #Romanian 
+    'rus': ['rus']             #Russian
+    'san': ['san']             #Sanskrit 
+    'sin': ['sin']             #Sinhala 
+    'slk': ['slk']             #Slovak 
+    'slv': ['slv']             #Slovenian 
+    'snd': ['snd']            #Sindhi 
+    'spa': ['spa']             #Spanish 
+    'spa_old': ['spa_old']      #Old Spanish
+    'sqi': ['sqi']             #Albanian 
+    'srp': ['srp']             #Serbian 
+    'srp_latn': ['srp_latn']   #Latin Serbian
+    'sun': ['sun']              #Sundanese 
+    'swa': ['swa']             #Swahili 
+    'swe': ['swe']             #Swedish
+    'syr': ['syr']             #Syriac 
+    'tam': ['tam']             #Tamil
+    'tat': ['tat']             #Tatar
+    'tel': ['tgk']             #Telugu
+    'tgk': ['tgk']             #Tajiik
+    'tha': ['tha']             #Thai 
+    'tir': ['tir']             #Tigrinya 
+    'ton': ['ton']             #Tonga 
+    'tur': ['tur']             #Turkish 
+    'uig': ['uig']             #Uighur 
+    'ukr': ['ukr']             #Ukrainian 
+    'urd': ['urd']             #Urdu
+    'urb': ['urb']             #Urubú-Kaapor
+    'uzb_cyrl': ['uzb_cyrl']   #Cyrillic Urubú-Kaapor
+    'vie': ['vie']              #Vietnamese 
+    'yid': ['yid']             #Yiddish 
+    'yor': ['yor']             #Yoruba 
+}
 
 class ImageTranslator():
     """
