@@ -18,6 +18,138 @@ pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe
 tra =Translator()
 
 #https://iso639-3.sil.org/
+
+TRANS_LANG={
+        #Google Trans
+    'afr': ['af']                               #Afrikaans
+    'amh': ['am']                               #Amharic
+    'ara': ['ar']                               #Arabic
+    'aze': ['az']                               #Azerbaijani
+
+    'bel': ['be']                               #Belarusian
+    'ben': ['bn']                               #Bengali
+    'bos': ['bs']                               #Bosnian
+    'bul': ['bg']                               #Bulgarian
+
+    'cat': ['ca']                               #Catalan
+    'ceb': ['ceb']                              #Cebuano
+    'ces': ['cs']                               #Czech
+    'chi_sim': ['zh-cn']                        #Chinese (simplified)
+    'chi_tra': ['zh-tw']                        #Chinese (traditional
+    'cos': ['co']                               #Corsican
+    'cym': ['cy']                               #Welsh
+
+    'dan': ['da']                               #Danish
+    'deu': ['de']                               #German
+
+    'ell': ['el']                               #Greek
+    'eng': ['en']                               #English
+    'est': ['et']                               #Estonian
+    'eus': ['eu']                               #Basque
+
+    'fas': ['fa']                               #Persian
+    'fin': ['fi']                               #Finnish
+    'fra': ['fr']                               #French
+    'fry': ['fy']                               #Frisian
+
+    'gla': ['gd']                               #Scottish Gaelic
+    'gle': ['ga']                               #Irish
+    'glg': ['gl']                               #Galician
+    'guj': ['gu']                               #Gujarati
+
+    'hat': ['ht']                               #Haitian
+    'heb': ['iw']                               #Hebrew
+    'hin': ['hi']                               #Hindi
+    'hrv': ['hr']                               #Croatian
+    'hun': ['hu']                               #Hungarian
+    'hye': ['hy']                               #Armenian
+
+    'ind': ['id']                               #Indonesian
+    'isl': ['is']                               #Icelandic
+    'ita': ['it']                               #Italian
+
+    'jav': ['jw']                               #Javanese
+    'jpn': ['ja']                               #Japanese
+
+    'kan': ['ka']                               #Kannada
+    'kat': ['ka']                               #Georgian
+    'kaz': ['kk']                               #Kazakh
+    'khm': ['km']                               #Khmer
+    'kir': ['ky']                               #Kyrgyz
+    'kmr': ['ku']                               #Kurdish
+    'kor': ['ko']                               #Korean
+
+    'lao': ['lo']                               #Lao
+    'lat': ['la']                               #Latin
+    'lav': ['lv']                               #Latvian
+    'lit': ['lt']                               #Lithuanian
+    'ltz': ['lb']                               #Luxembourgish
+
+    'mal': ['ml']                               #Malayalam
+    'mar': ['mr']                               #Marathi
+    'mkd': ['mk']                               #Macedonian
+    'mlt': ['mt']                               #Maltese
+    'mon': ['mn']                               #Mongolian
+    'mri': ['mi']                               #Maori
+    'msa': ['ms']                               #Malay
+    'mya': ['my']                               #Burmese
+
+    'nep': ['ne']                               #Nepali
+    'nld': ['nl']                               #Dutch
+    'nor': ['no']                               #Norwegian
+
+    'ory': ['or']                               #Odiya
+
+    'pol': ['pl']                               #Polish
+    'por': ['pt']                               #Portuguese
+    'pus': ['ps']                               #Pashto
+
+    'ron': ['ro']                               #Romanian
+    'rus': ['ru']                               #Russian
+
+    'slk': ['sk']                               #Slovak
+    'slv': ['sl']                               #Slovenian
+    'snd': ['sd']                               #Sindhi
+    'spa': ['es']                               #Spanish
+    'sqi': ['sq']                               #Albanian
+    'srp_latn': ['sr']                          #Serbian
+    'sun': ['su']                               #Sundase
+    'swa': ['sw']                               #Swahili
+    'swe': ['sv']                               #Swedish
+    'sna': ['sn']                               #Shona
+    'sin': ['si']                               #Sinhala
+
+    'tam': ['ta']                               #Tamil
+    'tgk': ['tg']                               #Tajik
+    'tha': ['th']                               #Thai
+    'tur': ['tr']                               #Turkish
+
+    'uig': ['ug']                               #Uighur
+    'ukr': ['uk']                               #Ukrainian
+    'urd': ['ur']                               #Urdu
+    'uzb': ['uz']                               #Uzbek
+    'vie': ['vi']                               #Vietnamese
+
+    'yid': ['yi']                               #Yiddish
+    'yor': ['yo']                               #Yoruba
+
+    #'zul': ['zu']                              #Zulu
+    #'xho': ['xh']                              #Xhosa
+    #'te': ['te']                               #Telegu
+    #'som': ['sl']                              #Somali
+    #'st':['st']                                #Sesotho
+    #'pan': ['']                                #Punjabi
+    #'nya': ['ny']                              #Chichewa
+    #'mlg': ['mg']                              #Malagasy
+    #'ibo': ['ib']                              #Igbo
+    #'hmn': ['hmn']                             #Hmong
+    #'epo': ['eo']                              #Esperanto
+    #'haw': ['hw']                              #Hawaiian
+    #'fil': ['tl']                              #Filipino
+    #'hau': ['ha']                              #Hausa
+    #'smo': ['sm']                              #Samoan
+}
+
 OCR_LANG={
             #Tesseract #EasyOCR
     'abq':['invalid','abq']                     #Abaza
@@ -119,7 +251,7 @@ OCR_LANG={
     'nld': ['nld','nl']                         #Dutch
     'nor': ['nor','no']                         #Norwegian
     'oci': ['oci','oc']                         #Occitan 
-    'ori': ['ori','invalid']                    #Oriya 
+    'ory': ['ori','invalid']                    #Oriya 
     'pan': ['pan','invalid']                    #Panjabi 
     'pol': ['pol','pl']                         #Polish 
     'por': ['por','pt']                         #Portuguese 
@@ -149,7 +281,7 @@ OCR_LANG={
     'tgk': ['tgk','invalid']                    #Tajiik
     'tha': ['tha','th']                         #Thai 
     'tir': ['tir','invalid']                    #Tigrinya
-    'tl': ['invalid','tl']                      #Tagalog 
+    'tgl': ['invalid','tl']                     #Tagalog 
     'ton': ['ton','invalid']                    #Tonga 
     'tur': ['tur','tr']                         #Turkish 
     'uig': ['uig','ug']                         #Uighur 
