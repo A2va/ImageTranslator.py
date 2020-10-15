@@ -16,210 +16,150 @@ import urllib
 
 pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
 tra =Translator()
-EASYOCR =[
-    'abq',#Abaza
-    'ady',#Adyghe
-    'af',#Afrikaans
-    'ang',#Angika
-    'ar',#Arabic
-    'as',#Assamese
-    'ava',#Ar
-    'az',#Azerbaijani
-    'be',#Belarusian
-    'bg',#Bulgarian
-    'bh',#Bihari
-    'bho',#Bhojpuri
-    'bn',#Bengali
-    'bs',#Bosnian
-    'ch_sim',#Simplified Chinese
-    'ch_tra',#Traditional Chinese
-    'che',#Chechen
-    'cs',#Czech
-    'cy',#Welsh
-    'da',#Danish
-    'dar',#Dargwa
-    'de',#German
-    'en',#English
-    'es',#Spanish
-    'et',#Estonian
-    'fa',#Persian (Farsi)
-    'fr',#French
-    'ga',#Irish
-    'gom',#Goan Konkani
-    'hi',#Hindi
-    'hr',#Croatian
-    'hu',#Hungarian
-    'id',#Indonesian
-    'inh',#Ingush
-    'is',#Icelandic
-    'it',#Italian
-    'ja',#Japanese
-    'kdb',#Kabardian
-    'ko',#Korean
-    'ku',#Ku#rdish
-    'la',#Latin
-    'lbe',#Lak
-    'lez',#Lezghian
-    'lt',#Lithuanian
-    'lv',#Latvian
-    'mah',#Magahi
-    'mai',#Maithili
-    'mi',#Maori
-    'mn',#Mongolian
-    'mr',#Marathi
-    'ms',#Malay
-    'mt',#Maltese
-    'ne',#Nepali
-    'new',#Newari
-    'nl',#Dutch
-    'no',#Norwegian
-    'oc',#Occitan
-    'pl',#Polish
-    'pt',#Portuguese
-    'ro',#Romanian
-    'ru',#Russian
-    'rs_cyrillic',#Serbian (cyrillic)
-    'rs_latin',#Serbian (latin)
-    'sck',#Nagpuri
-    'sk',#Slovak 
-    'sl',#Slovenian
-    'sq',#Albanian
-    'sv',#Swedish
-    'sw',#Swahili
-    'ta',#Tamil
-    'tab',#Tabassaran
-    'th',#Thai
-    'tl',#Tagalog
-    'tr',#Turkish
-    'ug',#Uyghur
-    'uk',#Ukranian
-    'ur',#Urdu
-    'uz',#Uzbek
-    'vi'#Vietnamese 
 
-]
-
+#https://iso639-3.sil.org/
 OCR_LANG={
             #Tesseract #EasyOCR
-    'afr': ['afr']            #Afrikaans
-    'amh': ['amh']              #Amharic
-    'ara': ['ara']              #Arabic
-    'asm': ['asm']             #Assamese
-    'aze': ['aze']              #Azerbaijani
-    'aze_cyrl': ['aze_cyrl']         
-    'bel': ['bel']              #Belarusian
-    'ben': ['ben']              #Bengali
-    'bod': ['bod']              #Tibetan
-    'bul': ['bul']              #Bulgarian
-    'cat': ['cat']              #Catalan
-    'ceb': ['ceb']              #Cebuano 
-    'ces': ['ces']              #Czech
-    'chi_sim': ['chi_sim']           #Chinese
-    'chi_sim_vert': ['chi_sim_vert'] #Vertical Chinese
-    'chi_tra':['chi_tra']           #Traditional Chinese 
-    'chi_tra_vert': ['chi_tra_vert']#Traditional Chinese verctical 
-    'chr': ['chr']             #Cherokee
-    'cos': ['cos']             #Corsican
-    'sim': ['sim']             #Mende (Papua New Guinea)
-    'dan': ['dan']             #Danish
-    'deu': ['deu']             #German
-    'div': ['div']             #Divehi
-    'dzo': ['dzo']             #Dzongkha
-    'ell': ['ell']             #Mordern Greek
-    'eng': ['eng']            #English
-    'enm': ['enm']             #Middle English
-    'est': ['est']             #Estonian
-    'eus': ['eus']             #Basque
-    'fao': ['fao']             #Faroese
-    'fas': ['fas']             #Persian
-    'fin': ['fin']             #Finnish
-    'fra': ['fra']            #French
-    'frk': ['frk']             #Frankish 
-    'frm': ['frm']            #Middle French
-    'fry': ['fry']             #Western Frisian
-    'gla': ['gla']             #Scottish Gaelic
-    'gle': ['gle']             #Irish
-    'glg': ['glg']             #Galician
-    'grc': ['grc']             #Ancient Greek
-    'quj': ['quj']             #Gujuarati
-    'hat': ['hat']             #Haitian
-    'heb': ['heb']             #Hebrew
-    'hin': ['hin']             #Hindi
-    'hrv': ['hrv']             #Croatian
-    'hun': ['hun']             #Hungarian
-    'hye': ['hye']             #Armenian
-    'iku': ['iku']             #Inuktitut 
-    'ind': ['ind']             #Indonesian
-    'isl': ['isl']             #Icelandic
-    'ita': ['ita']             #Italian
-    'ita_old': ['ita_old']      #Old Italian
-    'jav': ['jav']              #Javanese
-    'jpn': ['jpn']              #Japanese
-    'jpn_vert': ['jpn_vert']    #Vertcial Japanese
-    'kan': ['kan']             #Kannada
-    'kat': ['kat']             #Georgian
-    'kat_old': ['kat_old']     #Old Georgian
-    'kaz': ['kaz']             #Kazakh
-    'khm': ['khm']             #Khmer
-    'kir': ['kir']             #Kirghiz 
-    'kmr': ['kmr']             #Northern Kurdish
-    'kor': ['kor']             #Korean
-    'kor_vert': ['kor_vert']   #Vertical Korean
-    'lao': ['lao']             #Lao
-    'lat': ['lat']             #Latin
-    'lav': ['lav']             #Latvian
-    'lit': ['lit']             #Lithuanian 
-    'ltz': ['ltz']            #Luxembourgish 
-    'mal': ['mal']             #Malayalam 
-    'mar': ['mar']             #Marathi 
-    'mkd': ['mlt']            #Macedonian 
-    'mlt': ['mlt']             #Maltese 
-    'mon': ['mon']            #Mongolian 
-    'mri': ['mri']             #Maori 
-    'msa': ['msa']             #Malay 
-    'mya': ['mya']             #Burmese 
-    'nep': ['nep']             #Nepali 
-    'nld': ['nld']             #Dutch
-    'nor': ['nor']             #Norvegian
-    'oci': ['oci']             #Occitan 
-    'ori': ['ori']             #Oriya 
-    'pan': ['pan']             #Panjabi 
-    'pol': ['pol']             #Polish 
-    'por': ['por']            #Portuguese 
-    'pus': ['pus']             #Pushto 
-    'que': ['que']             #Quechua 
-    'ron': ['ron']             #Romanian 
-    'rus': ['rus']             #Russian
-    'san': ['san']             #Sanskrit 
-    'sin': ['sin']             #Sinhala 
-    'slk': ['slk']             #Slovak 
-    'slv': ['slv']             #Slovenian 
-    'snd': ['snd']            #Sindhi 
-    'spa': ['spa']             #Spanish 
-    'spa_old': ['spa_old']      #Old Spanish
-    'sqi': ['sqi']             #Albanian 
-    'srp': ['srp']             #Serbian 
-    'srp_latn': ['srp_latn']   #Latin Serbian
-    'sun': ['sun']              #Sundanese 
-    'swa': ['swa']             #Swahili 
-    'swe': ['swe']             #Swedish
-    'syr': ['syr']             #Syriac 
-    'tam': ['tam']             #Tamil
-    'tat': ['tat']             #Tatar
-    'tel': ['tgk']             #Telugu
-    'tgk': ['tgk']             #Tajiik
-    'tha': ['tha']             #Thai 
-    'tir': ['tir']             #Tigrinya 
-    'ton': ['ton']             #Tonga 
-    'tur': ['tur']             #Turkish 
-    'uig': ['uig']             #Uighur 
-    'ukr': ['ukr']             #Ukrainian 
-    'urd': ['urd']             #Urdu
-    'urb': ['urb']             #Urubú-Kaapor
-    'uzb_cyrl': ['uzb_cyrl']   #Cyrillic Urubú-Kaapor
-    'vie': ['vie']              #Vietnamese 
-    'yid': ['yid']             #Yiddish 
-    'yor': ['yor']             #Yoruba 
+    'abq':['invalid','abq']                     #Abaza
+    'ady':['invalid','ady']                     #Adyghe
+    'anp':['invalid','ang']                     #Angika
+    'afr': ['afr','af']                         #Afrikaans
+    'amh': ['amh','invalid']                    #Amharic
+    'ara': ['ara','ar']                         #Arabic
+    'asm': ['asm','as']                         #Assamese
+    'ava':['invalid','ava']                     #Avar
+    'aze': ['aze','az']                         #Azerbaijani
+    'aze_cyrl': ['aze_cyrl','invalid']  
+    'bih': ['invalid','bh']                     #Bihari      
+    'bel': ['bel','be']                         #Belarusian
+    'ben': ['ben','bn']                         #Bengali
+    'bho': ['invalid','bho']                    #Bhojpuri
+    'bod': ['bod','invalid']                    #Tibetan
+    'bos': ['invalid','bos']                    #Bosnian
+    'bul': ['bul','bg']                         #Bulgarian
+    'cat': ['cat','invalid']                    #Catalan
+    'ceb': ['ceb','invalid']                    #Cebuano 
+    'ces': ['ces','cz']                         #Czech
+    'che': ['invalid','che']                    #Chechen
+    'chi_sim': ['chi_sim','ch_sim']             #Sinplified Chinese
+    'chi_sim_vert': ['chi_sim_vert','invalid']  #Vertical Simplified Chinese
+    'chi_tra':['chi_tra','ch_tra']              #Traditional Chinese 
+    'chi_tra_vert': ['chi_tra_vert','invalid']  #Traditional Chinese verctical 
+    'chr': ['chr','invalid']                    #Cherokee
+    'cos': ['cos','invalid']                    #Corsican
+    'cym': ['invalid','cy']                     #Welsh
+    'sim': ['sim','invalid']                    #Mende (Papua New Guinea)
+    'dan': ['dan','da']                         #Danish
+    'dar': ['invalid','dar']                    #Dargwa
+    'deu': ['deu','de']                         #German
+    'div': ['div','invalid']                    #Divehi
+    'dzo': ['dzo','invalid']                    #Dzongkha
+    'ell': ['ell','invalid']                    #Mordern Greek
+    'eng': ['eng','en']                         #English
+    'enm': ['enm','invalid']                    #Middle English
+    'est': ['est','et']                         #Estonian
+    'eus': ['eus','invalid']                    #Basque
+    'fao': ['fao','invalid']                    #Faroese
+    'fas': ['fas','fa']                         #Persian
+    'fin': ['fin','invalid']                    #Finnish
+    'fra': ['fra','fr']                         #French
+    'frk': ['frk','invalid']                    #Frankish 
+    'frm': ['frm','invalid']                    #Middle French
+    'fry': ['fry','invalid']                    #Western Frisian
+    'gla': ['gla','invalid']                    #Scottish Gaelic
+    'gle': ['gle','ga']                         #Irish
+    'glg': ['glg','invalid']                    #Galician
+    'gom': ['invalid','gom']                    #Goan Konkani
+    'grc': ['grc','invalid']                    #Ancient Greek
+    'quj': ['quj','invalid']                    #Gujuarati
+    'hat': ['hat','invalid']                    #Haitian
+    'heb': ['heb','invalid']                    #Hebrew
+    'hin': ['hin','hi']                         #Hindi
+    'hrv': ['hrv','hr']                         #Croatian
+    'hun': ['hun','hu']                         #Hungarian
+    'hye': ['hye','invalid']                    #Armenian
+    'iku': ['iku'.'invalid']                    #Inuktitut 
+    'ind': ['ind','id']                         #Indonesian
+    'inh': ['invalid','inh']                    #Ingush
+    'isl': ['isl','is']                         #Icelandic
+    'ita': ['ita','it']                         #Italian
+    'ita_old': ['ita_old','invalid']            #Old Italian
+    'jav': ['jav','invalid']                    #Javanese
+    'jpn': ['jpn','jp']                         #Japanese
+    'jpn_vert': ['jpn_vert','invalid']          #Vertical Japanese
+    'kan': ['kan','invalid']                    #Kannada
+    'kat': ['kat','invalid']                    #Georgian
+    'kat_old': ['kat_old','invalid']            #Old Georgian
+    'kaz': ['kaz','invalid']                    #Kazakh
+    'kdb': ['invalid','kdb']                    #Kabardian
+    'khm': ['khm','invalid']                    #Khmer
+    'kir': ['kir','invalid']                    #Kirghiz 
+    'kmr': ['kmr','ku']                         #Northern Kurdish
+    'kor': ['kor','ko']                         #Korean
+    'kor_vert': ['kor_vert','invalid']          #Vertical Korean
+    'lao': ['lao','invalid']                    #Lao
+    'lat': ['lat','la']                         #Latin
+    'lav': ['lav','lv']                         #Latvian
+    'lbe': ['invalid','lbe']                    #Lak
+    'lez': ['invalid','lez']                    #Lezghian
+    'lit': ['lit','lt']                         #Lithuanian 
+    'ltz': ['ltz','invalid']                    #Luxembourgish 
+    'mai': ['invalid','mai']                    #Maithili
+    'mah': ['invalid','mah']                    #Magahi
+    'mal': ['mal','invalid']                    #Malayalam
+    'mar': ['mar','mr']                         #Marathi 
+    'mkd': ['mlt','invalid']                    #Macedonian 
+    'mlt': ['mlt','mt']                         #Maltese 
+    'mon': ['mon','mn']                         #Mongolian 
+    'mri': ['mri','mi']                         #Maori 
+    'msa': ['msa','ms']                         #Malay 
+    'mya': ['mya','invalid']                    #Burmese 
+    'nep': ['nep','ne']                         #Nepali 
+    'new': ['invalid','new']                    #Newari
+    'nld': ['nld','nl']                         #Dutch
+    'nor': ['nor','no']                         #Norwegian
+    'oci': ['oci','oc']                         #Occitan 
+    'ori': ['ori','invalid']                    #Oriya 
+    'pan': ['pan','invalid']                    #Panjabi 
+    'pol': ['pol','pl']                         #Polish 
+    'por': ['por','pt']                         #Portuguese 
+    'pus': ['pus','invalid']                    #Pushto 
+    'que': ['que','invalid']                    #Quechua 
+    'ron': ['ron','ro']                         #Romanian 
+    'rus': ['rus','ru']                         #Russian
+    'san': ['san','invalid']                    #Sanskrit
+    'sck': ['invalid','sck']                    #Nagpuri
+    'sin': ['sin','invalid']                    #Sinhala 
+    'slk': ['slk','sk']                         #Slovak 
+    'slv': ['slv','sl']                         #Slovenian 
+    'snd': ['snd','invalid']                    #Sindhi 
+    'spa': ['spa','es']                         #Spanish 
+    'spa_old': ['spa_old']                      #Old Spanish
+    'sqi': ['sqi','sq']                         #Albanian 
+    'srp': ['srp','rs_cyrillic']                #Serbian 
+    'srp_latn': ['srp_latn','rs_latin']         #Latin Serbian
+    'sun': ['sun','invalid']                    #Sundanese 
+    'swa': ['swa','sw']                         #Swahili 
+    'swe': ['swe','sv']                         #Swedish
+    'syr': ['syr','invalid']                    #Syriac
+    'tab': ['invalid','tab']                    #Tabassaran
+    'tam': ['tam','ta']                         #Tamil
+    'tat': ['tat','invalid']                    #Tatar
+    'tel': ['tgk','invalid']                    #Telugu
+    'tgk': ['tgk','invalid']                    #Tajiik
+    'tha': ['tha','th']                         #Thai 
+    'tir': ['tir','invalid']                    #Tigrinya
+    'tl': ['invalid','tl']                      #Tagalog 
+    'ton': ['ton','invalid']                    #Tonga 
+    'tur': ['tur','tr']                         #Turkish 
+    'uig': ['uig','ug']                         #Uighur 
+    'ukr': ['ukr','uk']                         #Ukrainian 
+    'urd': ['urd','ur']                         #Urdu
+    'uzb': ['uzb','uz']                         #Uzbek
+    'urb_cyrl': ['urb_cyrl','invalid']          #Cyrillic Uzbek
+    'vie': ['vie','vi']                         #Vietnamese 
+    'yid': ['yid','invalid']                    #Yiddish 
+    'yor': ['yor','invalid']                    #Yoruba 
 }
 
 class ImageTranslator():
