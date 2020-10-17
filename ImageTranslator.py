@@ -268,6 +268,11 @@ class ImageTranslator():
         return text
     def __run_deepl(self,text):
 
+        tra =DeepL((text['string'],lang.TRANS_LANG[self.dest_lang][2],lang.TRANS_LANG[self.src_lang][2])
+        string=tra.translate()
+        text['translated_string']=string
+
+        return text
         
     def __apply_translation(self,text):
         """
