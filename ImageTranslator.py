@@ -19,7 +19,7 @@ import utils.lang as lang
 import urllib
 
 pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
-tra =Translator()
+
 
 
 class ImageTranslator():
@@ -29,13 +29,16 @@ class ImageTranslator():
     Args: img This can be file,bytes or URL
         ocr: 'EasyOCR' or 'Tesseract'
     """
-    def __init__(self,img,ocr):
+    def __init__(self,img,ocr,translator,src_lang,dest_lang):
 
         self.img= self.__reformat_input(img)
         self.img_out=self.img.copy()
         self.text=[]
         self.mask_paragraph=None
         self.ocr=ocr
+        self.translator=translator
+        self.src_lang=src_lang
+        self.dest_lang=dest_lang
 
     def processing(self):
         self.mask_paragraph=self.__detect_text(self.img)
@@ -115,7 +118,7 @@ class ImageTranslator():
         """
         Run tesseract OCR
         """
-        boxes = pytesseract.image_to_data(paragraph['image'])
+        boxes = pytesseract.image_to_data(paragraph['image'],lang=lang.OCR_LANG[self.src_lang][0])
         string=''
         x,y,w,h=(0,0,0,0)
         first=True
@@ -143,7 +146,7 @@ class ImageTranslator():
         """
         Run EasyOCR
         """
-        reader = easyocr.Reader(['en'])
+        reader = easyocr.Reader([lang.OCR_LANG[self.src_lang][1]])
         result = reader.readtext(paragraph['image'])
         #1|----------------------------|2
         # |                            |
@@ -238,15 +241,34 @@ class ImageTranslator():
                 lines.append(line)    
         return lines
 
-    def __translate_text(self,text):
+    def __run_translator(self,text):
         """
-        Translate the text
+        Run OCR between Tesseract and EasyOCR
         """
-        string= tra.translate(text['string'],dest='fr').text
+        if self.translator=='Googles':
+            return self.__run_easyocr(paragraph)
+        elif self.translator=='Bing':
+            return self.__run_tesserract(paragraph)
+        elif self.translator=='DeepL':
+
+    def __run_google(self,text):
+        tra =Translator()
+
+        string= tra.translate(text['string'],dest=lang.TRANS_LANG[self.dest_lang][0],src=lang.TRANS_LANG[self.src_lang][0]).text
+        text['translated_string']=string
+
+        return text
+
+    def __run_bing(self,text):
+        tra=BingTranslator()
+        string=tra.translate(text['string'],lang.TRANS_LANG[self.dest_lang][1],lang.TRANS_LANG[self.src_lang][1])
 
         text['translated_string']=string
+
         return text
-    
+    def __run_deepl(self,text):
+
+        
     def __apply_translation(self,text):
         """
         Apply the translation on img_out
