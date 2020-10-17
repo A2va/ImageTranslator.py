@@ -1,0 +1,5 @@
+opencv-python
+Pillow
+googletrans
+pytesseract
+PyBinglate
