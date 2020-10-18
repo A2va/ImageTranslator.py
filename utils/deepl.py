@@ -83,7 +83,7 @@ class DeepL:
         o = Options()
         # o.binary_location = '/usr/bin/google-chrome'
         o.add_argument('--headless')    # if commented. window will be open
-        o.add_argument('--disable-gpu') # if commented, window will be open
+        o.add_argument('--disable-gpu')
         o.add_argument('--disable-dev-shm-usage')
         o.add_argument('--remote-debugging-port=9222')
         o.add_argument('--disable-setuid-sandbox')
@@ -119,6 +119,3 @@ class DeepL:
         res = output_area.get_attribute('value').rstrip()
         d.quit()
         return res
-
-tra =DeepL('This is a test','en','fr')
-print(tra.translate())
