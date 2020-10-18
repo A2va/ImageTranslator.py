@@ -20,7 +20,7 @@ DEBUG=0
 PROXY = ""
 LOOP = asyncio.get_event_loop()
 class DeepL:
-    def __init__(self,text,src_lang,dest_lang):
+    def __init__(self,text,dest_lang,src_lang):
         self.src_lang=src_lang
         self.dest_lang=dest_lang
         self.text=text
@@ -225,7 +225,6 @@ class DeepL:
 
 
         return res
-
 
 
 

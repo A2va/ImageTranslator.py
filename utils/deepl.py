@@ -39,7 +39,7 @@ class DeepLPageLoadError(Exception):
     pass
 
 class DeepL:
-    def __init__(self,text,src_lang,dest_lang):
+    def __init__(self,text,dest_lang,src_lang):
         self.src_lang=src_lang
         self.dest_lang=dest_lang
         self.text=text
@@ -119,3 +119,5 @@ class DeepL:
         res = output_area.get_attribute('value').rstrip()
         d.quit()
         return res
+
+

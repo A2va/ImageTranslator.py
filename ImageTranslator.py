@@ -13,14 +13,24 @@ import craft_text_detector as craft_detector
 from text_binarization import textBin
 #Translator
 from googletrans import Translator
-
+from PyBinglate import BingTranslator
+from utils.deeplv2 import DeepL
 import utils.lang as lang
+
 
 import urllib
 
 pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
 
-
+TRANS={
+    'Google':0,
+    'Bing':1,
+    'DeepL':2
+}
+OCR= {
+    'Tesseract':0,
+    'EasyOCR': 1
+}
 
 class ImageTranslator():
     """
@@ -53,11 +63,11 @@ class ImageTranslator():
         for i in range(0,len(self.text)):
             x=self.text[i]['x']
             y=self.text[i]['y']
-            w=self.text[i]['w']
-            h=self.text[i]['h']
+            w=self.text[i]['paragraph_w']
+            h=self.text[i]['paragraph_h']
             if self.text[i]['string'] !='':
                 cv2.rectangle(self.img_out, (x,y), (x+w, y+h), (255, 255,255), -1)
-                self.text[i]=self.__translate_text(self.text[i])
+                self.text[i]=self.__run_translator(self.text[i])
                 self.__apply_translation(self.text[i])
 
 
@@ -109,16 +119,17 @@ class ImageTranslator():
         """
         Run OCR between Tesseract and EasyOCR
         """
+        lang_code=lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
         if self.ocr=='EasyOCR':
-            return self.__run_easyocr(paragraph)
+            return self.__run_easyocr(paragraph,lang_code)
         elif self.ocr=='Tesseract':
-            return self.__run_tesserract(paragraph)
+            return self.__run_tesserract(paragraph,lang_code)
 
-    def __run_tesserract(self,paragraph):
+    def __run_tesserract(self,paragraph,lang_code):
         """
         Run tesseract OCR
         """
-        boxes = pytesseract.image_to_data(paragraph['image'],lang=lang.OCR_LANG[self.src_lang][0])
+        boxes = pytesseract.image_to_data(paragraph['image'],lang=lang_code)
         string=''
         x,y,w,h=(0,0,0,0)
         first=True
@@ -138,6 +149,8 @@ class ImageTranslator():
                 'y':y+paragraph['y']-20,
                 'w':w,
                 'h':h,
+                'paragraph_w':paragraph['w']+20,
+                'paragraph_h':paragraph['h']+20,
                 'string':string,
                 'image': paragraph['image'],
                 'max_width':paragraph['w']
@@ -146,7 +159,7 @@ class ImageTranslator():
         """
         Run EasyOCR
         """
-        reader = easyocr.Reader([lang.OCR_LANG[self.src_lang][1]])
+        reader = easyocr.Reader([lang_code])
         result = reader.readtext(paragraph['image'])
         #1|----------------------------|2
         # |                            |
@@ -160,15 +173,16 @@ class ImageTranslator():
         for res in result:
             string+=res[1]
         return {
-            'x':x+paragraph['x']-45,
-            'y':y+paragraph['y']-20,
-            'w':w,
-            'h':h,
-            'string':string,
-            'image':paragraph['image'],
-            'max_width':paragraph['w']
-
-        }
+                'x':x+paragraph['x']-45,
+                'y':y+paragraph['y']-20,
+                'w':w,
+                'h':h,
+                'paragraph_w':paragraph['w']+20,
+                'paragraph_h':paragraph['h']+20,
+                'string':string,
+                'image': paragraph['image'],
+                'max_width':paragraph['w']
+            }
 
     def __craft(self,img):
         """
@@ -213,7 +227,7 @@ class ImageTranslator():
             print('[Warning] Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
         return img
 
-    def __text_wrap(text, font, max_width):
+    def __text_wrap(self,text, font, max_width):
         """
         Wrap the into multiple lines
         """
@@ -243,32 +257,35 @@ class ImageTranslator():
 
     def __run_translator(self,text):
         """
-        Run OCR between Tesseract and EasyOCR
+        Run OCR between Google, Bing and DeepL
         """
-        if self.translator=='Googles':
-            return self.__run_easyocr(paragraph)
+        src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
+        dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
+        if self.translator=='Google':
+            return self.__run_google(text,dest_lang,src_lang)
         elif self.translator=='Bing':
-            return self.__run_tesserract(paragraph)
+            return self.__run_bing(text,dest_lang,src_lang)
         elif self.translator=='DeepL':
+            return self.__run_deepl(text,dest_lang,src_lang)
 
-    def __run_google(self,text):
+    def __run_google(self,text,dest_lang,src_lang):
         tra =Translator()
 
-        string= tra.translate(text['string'],dest=lang.TRANS_LANG[self.dest_lang][0],src=lang.TRANS_LANG[self.src_lang][0]).text
+        string= tra.translate(text['string'],dest=dest_lang,src=src_lang).text
         text['translated_string']=string
 
         return text
 
-    def __run_bing(self,text):
+    def __run_bing(self,text,dest_lang,src_lang):
         tra=BingTranslator()
-        string=tra.translate(text['string'],lang.TRANS_LANG[self.dest_lang][1],lang.TRANS_LANG[self.src_lang][1])
+        string=tra.translate(text['string'],dest_lang,src_lang)
 
         text['translated_string']=string
 
         return text
-    def __run_deepl(self,text):
+    def __run_deepl(self,text,dest_lang,src_lang):
 
-        tra =DeepL((text['string'],lang.TRANS_LANG[self.dest_lang][2],lang.TRANS_LANG[self.src_lang][2])
+        tra =DeepL(text['string'],dest_lang,src_lang)
         string=tra.translate()
         text['translated_string']=string
 
@@ -283,18 +300,20 @@ class ImageTranslator():
         draw = ImageDraw.Draw(im_pil)
 
         font_file_path = 'Cantarell.ttf'
-        font_size=int(h*1.1)
+        font_size=int(text['h']*1.1)
         font = ImageFont.truetype(font_file_path, size=font_size, encoding="unic")
 
-        lines = text_wrap(text['translated_string'], font,text['max_width'])
+        lines = self.__text_wrap(text['translated_string'],font,text['max_width'])
         line_height = font.getsize('hg')[1]
+        y=text['y']
         for line in lines:
-            draw.text((text['x'], text['y']), line, fill=(0,0,0), font=font)
+            draw.text((text['x'], y), line, fill=(0,0,0), font=font)
             y = y + line_height
         self.img_out = np.asarray(im_pil)
 
 
 
-test=ImageTranslator('https://i.stack.imgur.com/vrkIj.png','Tesseract')
+test=ImageTranslator('https://i.stack.imgur.com/vrkIj.png','Tesseract','Google','eng','fra')
 test.processing()
+cv2.imwrite('out.jpg',test.img_out)
 
