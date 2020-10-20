@@ -10,7 +10,7 @@ from PIL import ImageDraw
 
 import craft_text_detector as craft_detector
 
-from text_binarization import textBin
+from text_binarization import TextBin
 #Translator
 from googletrans import Translator
 from PyBinglate import BingTranslator
@@ -55,7 +55,7 @@ class ImageTranslator():
         paragraphs=self.__detect_paragraph()
         #Apply Binarization and ocr
         for paragraph in paragraphs:
-            binary=textBin(paragraph['image'])
+            binary=TextBin(paragraph['image'])
             paragraph['image']=binary.processing()
 
             self.text.append(self.__run_ocr(paragraph))
