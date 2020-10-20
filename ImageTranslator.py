@@ -19,17 +19,28 @@ import utils.lang as lang
 
 
 import urllib
+#Logging
+import logging
+
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
+
+stdout_handler = logging.StreamHandler(sys.stdout)
+log.addHandler(stdout_handler)
+# output_file_handler = logging.FileHandler("latest.log")
+# log.addHandler(output_file_handler)
+
 
 pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
 
 TRANS={
-    'Google':0,
-    'Bing':1,
-    'DeepL':2
+    'google':0,
+    'bing':1,
+    'deepl':2
 }
 OCR= {
-    'Tesseract':0,
-    'EasyOCR': 1
+    'tesseract':0,
+    'easyOCR': 1
 }
 
 class ImageTranslator():
@@ -75,6 +86,7 @@ class ImageTranslator():
         """
         Return a mask from the text location
         """
+        log.debug('Run CRAFT text detector and create mask')
         blank_image = np.zeros((img.shape[0],img.shape[1],3), np.uint8)
         prediction_result=self.__craft(img)
         boxes=prediction_result['boxes']
@@ -90,6 +102,7 @@ class ImageTranslator():
         """
         Return a dict with cropped paragraph and location
         """
+        log.debug('Crop each paragraph')
         paragraph=[]
         img=self.img.copy()
 
@@ -120,6 +133,12 @@ class ImageTranslator():
         Run OCR between Tesseract and EasyOCR
         """
         lang_code=lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
+        if lang_code =='invalid':
+            log.warning(f'The {self.ocr} ocr has no {self.src_lang}. Switch to tesseract')
+            lang_code=lang.OCR_LANG[self.src_lang][OCR['tesseract']]
+             
+            return self.__run_tesserract(paragraph,lang_code)
+        log.debug(f'Run {self.ocr} ocr')
         if self.ocr=='EasyOCR':
             return self.__run_easyocr(paragraph,lang_code)
         elif self.ocr=='Tesseract':
@@ -259,8 +278,16 @@ class ImageTranslator():
         """
         Run OCR between Google, Bing and DeepL
         """
+        log.debug(f'Run {self.translator} translator')
         src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
         dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
+        if src_lang =='invalid' or dest_lang=='invalid':
+            log.warning(f'The {self.translator} ocr has no {self.src_lang} or {self.dest_lang}. Switch to google')
+            src_lang = lang.TRANS_LANG[self.src_lang][TRANS['google']]
+            dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
+
+            return self.__run_google(text,dest_lang,src_lang)
+
         if self.translator=='Google':
             return self.__run_google(text,dest_lang,src_lang)
         elif self.translator=='Bing':
@@ -295,7 +322,7 @@ class ImageTranslator():
         """
         Apply the translation on img_out
         """
-
+        log.debug('Apply translation to image')
         im_pil = Image.fromarray(self.img_out)
         draw = ImageDraw.Draw(im_pil)
 
