@@ -1,3 +1,26 @@
+# MIT License
+
+# Copyright (c) 2020 ffreemt
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE
+# https://github.com/ffreemt/deepl-tr-async
+
 from typing import Any, List, Optional, Tuple, Union
 
 # import os
@@ -11,7 +34,16 @@ from pyquery import PyQuery as pq
 
 
 import logging
-import logging as logger
+
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
+
+stdout_handler = logging.StreamHandler(sys.stdout)
+log.addHandler(stdout_handler)
+# output_file_handler = logging.FileHandler("latest.log")
+# log.addHandler(output_file_handler)
+
+
 URL = r"https://www.deepl.com/translator"
 LOOP = asyncio.get_event_loop()
 
@@ -39,10 +71,10 @@ class DeepL:
                 ],
                 # autoClose=False,
                 headless=1,
-                #dumpio=True,
+                dumpio=True,
             )
         except Exception as exc:
-            logging.error("get_ppbrowser exc: %s", exc)
+            log.error("get_ppbrowser exc: %s", exc)
             raise
         return browser
 
@@ -66,10 +98,9 @@ class DeepL:
                 page = await self.browser.newPage()
                 break
             except Exception as exc:
-                logging.error(" browser.newPage exc: %s, failed attempt: %s", exc, count)
+                log.error(f"browser.newPage exc: {exc}, failed attempt: {count}")
                 await asyncio.sleep(0)
         else:
-            # giving up
             return
 
 
@@ -78,35 +109,33 @@ class DeepL:
         url_ = f"{URL}#{self.src_lang}/{self.dest_lang}/{quote(text)}"
         # url_ = f'{URL}#{from_lang}/{to_lang}/'
 
-        # await page.type(".lmt__source_textarea", text + text + ' ' * 90)
+       
 
         count = 0
         while count < 3:
             count += 1
             try:
-                # await page.goto(url_)
                 await page.goto(url_, {"timeout": 90 * 1000})
-                # await page.goto(url_, {"timeout": 0})
                 break
             except Exception as exc:
                 await syncio.sleep(0)
                 page = await self.browser.newPage()
-                logging.warning("page.goto exc: %s, attempt %s", str(exc)[:100], count)
+                log.warning(f"page.goto exc: {str(exc)}, attempt {count}")
         else:
             # return
-            raise Exception("Unable to fetch %s..." % url_[:20])
+            raise Exception(f"Unable to fetch {url_[:20]}...")
 
         # wait for input area ".lmt__source_textarea"
         try:
             # await page.waitFor(".lmt__message_box2__content")
             await page.waitForSelector(".lmt__source_textarea", {"timeout": 1000})  # ms
-            logging.debug(" *** .lmt__source_textarea success")
+            log.debug("Succes getting source textarea")
         # except TimeoutError:
         except Exception as exc:
             await asyncio.sleep(0.5)
             # raise
 
-        logging.debug("page.goto(url_) time: %.2f s", default_timer() - then)
+        log.debug(f"page.goto(url_) time: {default_timer() - then } s")
         then = default_timer()
 
         # .lmt__message_box2__content
@@ -126,28 +155,20 @@ class DeepL:
             # raise
         """
 
-        # _ = int(min(10, len(text) * 0.2))
-        # await page.type(".lmt__source_textarea", text + ' ' * _)
-
         if waitfor is None:
             _ = max(100, len(text) * 3.6)
-            logging.debug("waiting for %.1f ms", _)
+            logging.debug(f"waiting for {_} ms")
         else:
             try:
                 _ = float(waitfor)
             except Exception as exc:
                 logging.warning(
-                    " invalif waitfor [%s]: %s, setting to auto-adjust", waitfor, exc
+                    f"invalif waitfor [{waitfor}]: %s, setting to auto-adjust", waitfor, exc
                 )
                 _ = max(100, len(text) * 3.6)
 
             logging.debug("preset fixed waiting for %.1f ms", _)
 
-        # ".lmt__translations_as_text"
-        # await page.waitFor(".lmt__translations_as_text", {"timeout": _})  # ms
-
-        # logger.debug(" is page closed? ")
-        try:
             await page.waitFor(_)
         except Exception as exc:
             logging.warning(" page.waitFor exc: %s", exc)
@@ -161,7 +182,6 @@ class DeepL:
         #element = await page.querySelector('.lmt__target_textarea')
         #title = await page.evaluate('(element) => element.textContent', element)
  
-
         count = -1
         while count < 50:
             count += 1
@@ -186,10 +206,6 @@ class DeepL:
 
         await asyncio.sleep(0.2)
 
-        # copy('\n'.join(wrap(res, 45)))
-
-        # logger.info('exit: %s', text[:200])
-
         return res
 
 
@@ -210,7 +226,6 @@ class DeepL:
 
         sents=self.text
         self.browser=LOOP.run_until_complete(self.get_ppbrowser())
-        # browser = await get_ppbrowser(headless)
         try:
             res = loop.run_until_complete( 
                 self.deepl_tr_async(
@@ -222,7 +237,6 @@ class DeepL:
         except Exception as exc:
             logging.error(" loop.run_until_complete exc: %s", exc)
             res = str(exc)
-
 
         return res
 

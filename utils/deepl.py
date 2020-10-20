@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#https://github.com/eggplants/deepl-cli
+# https://github.com/eggplants/deepl-cli
 
 import sys
 import time
@@ -31,6 +31,19 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+
+import logging
+
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
+
+stdout_handler = logging.StreamHandler(sys.stdout)
+log.addHandler(stdout_handler)
+# output_file_handler = logging.FileHandler("latest.log")
+# log.addHandler(output_file_handler)
+
+
+
 
 class DeepLArgCheckingError(Exception):
     pass
@@ -61,11 +74,13 @@ class DeepL:
 
         if self.src_lang == self.dest_lang:
             # raise err if <fr:lang> == <to:lang>
-            raise DeepLArgCheckingError('Two languages cannot be same.')
+            log.error(f'Two languages cannot be same.')
+            raise DeepLArgCheckingError(f'Two languages cannot be same.')
 
         if len(self.text) > 5000:
             # raise err if stdin > 5000 chr
-            raise DeepLArgCheckingError('limit of script is less than 5000 chars(Now: %d chars).'%len(self.text))
+            log.error(f'Limit of text input is 5000 chars (Now: {len(self.text)} chars)')
+            raise DeepLArgCheckingError(f'Limit of text input is 5000 chars (Now: {len(self.text)} chars)')
 
         self.fr_lang = ('auto' if   self.src_lang[0] == ''
                                else self.src_lang[0]
@@ -76,7 +91,8 @@ class DeepL:
         """Open a deepl page and throw a request."""
 
         if not self.internet_on():
-            raise DeepLPageLoadError('Your network seem to be offline.')
+            log.error(f'Your network seem to be offline.')
+            raise DeepLPageLoadError(f'Your network seem to be offline.')
 
         self.validate()
         
@@ -102,6 +118,7 @@ class DeepL:
                 EC.presence_of_all_elements_located
             )
         except TimeoutException as te:
+            log.error(f'Timeout exception')
             raise DeepLCLIPageLoadError(te)
 
         input_area = d.find_element_by_xpath(
