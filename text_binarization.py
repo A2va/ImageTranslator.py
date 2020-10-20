@@ -147,7 +147,7 @@ class TextBin():
         return True
 
 
-    def processing(self):
+    def run(self):
 
         blue, green, red = cv2.split(self.img)
 

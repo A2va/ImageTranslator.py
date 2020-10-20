@@ -44,11 +44,12 @@ OCR= {
 }
 
 class ImageTranslator():
-    """
-    The main class of the translator 
-    
-    Args: img This can be file,bytes or URL
-        ocr: 'EasyOCR' or 'Tesseract'
+    """ 
+    img: path file, bytes URL, Pillow/OpenCV image and data URI\n
+    ocr: 'tesseract' or 'easyocr'\n
+    translator: 'google' , 'bing' and  'deepl'\n
+    src_lang: source language of image. See code in utils.lang\n
+    dest_lang: destination language of image. See code in utils.lang\n
     """
     def __init__(self,img,ocr,translator,src_lang,dest_lang):
 
@@ -67,7 +68,7 @@ class ImageTranslator():
         #Apply Binarization and ocr
         for paragraph in paragraphs:
             binary=TextBin(paragraph['image'])
-            paragraph['image']=binary.processing()
+            paragraph['image']=binary.run()
 
             self.text.append(self.__run_ocr(paragraph))
 
@@ -100,7 +101,13 @@ class ImageTranslator():
 
     def __detect_paragraph(self):
         """
-        Return a dict with cropped paragraph and location
+        Return a dict {
+             'image':cropped,
+             'x':x,
+             'y':y,
+             'w':w,
+             'h':h
+        }
         """
         log.debug('Crop each paragraph')
         paragraph=[]
@@ -130,13 +137,13 @@ class ImageTranslator():
         
     def __run_ocr(self,paragraph):
         """
-        Run OCR between Tesseract and EasyOCR
+        
         """
         lang_code=lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
         if lang_code =='invalid':
             log.warning(f'The {self.ocr} ocr has no {self.src_lang}. Switch to tesseract')
             lang_code=lang.OCR_LANG[self.src_lang][OCR['tesseract']]
-             
+
             return self.__run_tesserract(paragraph,lang_code)
         log.debug(f'Run {self.ocr} ocr')
         if self.ocr=='EasyOCR':
@@ -146,7 +153,18 @@ class ImageTranslator():
 
     def __run_tesserract(self,paragraph,lang_code):
         """
-        Run tesseract OCR
+            Return a dict
+            {
+                'x':x,
+                'y':y,
+                'w':w,
+                'h':h,
+                'paragraph_w':paragepah width,
+                'paragraph_h':paragraph height,
+                'string':string,
+                'image': image,
+                'max_width':max width of paragraph
+            }
         """
         boxes = pytesseract.image_to_data(paragraph['image'],lang=lang_code)
         string=''
@@ -243,7 +261,7 @@ class ImageTranslator():
                 img = image[:,:,:3]
                 img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         else:
-            print('[Warning] Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
+            log.error('Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
         return img
 
     def __text_wrap(self,text, font, max_width):
@@ -276,7 +294,7 @@ class ImageTranslator():
 
     def __run_translator(self,text):
         """
-        Run OCR between Google, Bing and DeepL
+        Run translator between Google, Bing and DeepL
         """
         log.debug(f'Run {self.translator} translator')
         src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
@@ -296,6 +314,9 @@ class ImageTranslator():
             return self.__run_deepl(text,dest_lang,src_lang)
 
     def __run_google(self,text,dest_lang,src_lang):
+        """
+        Run google translator
+        """
         tra =Translator()
 
         string= tra.translate(text['string'],dest=dest_lang,src=src_lang).text
@@ -304,6 +325,9 @@ class ImageTranslator():
         return text
 
     def __run_bing(self,text,dest_lang,src_lang):
+        """
+        Run bing translator
+        """
         tra=BingTranslator()
         string=tra.translate(text['string'],dest_lang,src_lang)
 
@@ -311,7 +335,9 @@ class ImageTranslator():
 
         return text
     def __run_deepl(self,text,dest_lang,src_lang):
-
+        """
+        Run deepl translator
+        """
         tra =DeepL(text['string'],dest_lang,src_lang)
         string=tra.translate()
         text['translated_string']=string
@@ -340,7 +366,7 @@ class ImageTranslator():
 
 
 
-test=ImageTranslator('https://i.stack.imgur.com/vrkIj.png','Tesseract','Google','eng','fra')
+test=ImageTranslator('https://i.stack.imgur.com/vrkIj.png','tesseract','google','eng','fra')
 test.processing()
 cv2.imwrite('out.jpg',test.img_out)
 
