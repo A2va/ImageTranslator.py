@@ -3,32 +3,33 @@ import cv2
 import pytesseract
 import numpy as np
 
-from PIL import ImageGrab
-from PIL import Image
-from PIL import ImageFont
-from PIL import ImageDraw
+import PIL.Image as PIL_Img
+import PIL.ImageGrab as PIL_ImgGrab
+import PIL.ImageFont as PIL_ImgFont
+import PIL.ImageDraw as PIL_ImgDraw
 
+#Text detector
 import craft_text_detector as craft_detector
 
 from text_binarization import TextBin
 #Translator
 from googletrans import Translator
 from PyBinglate import BingTranslator
-from utils.deeplv2 import DeepL
+from utils.deepl import DeepL
 import utils.lang as lang
 
 
 import urllib
+
 #Logging
+import sys
 import logging
-
+logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
 
-stdout_handler = logging.StreamHandler(sys.stdout)
-log.addHandler(stdout_handler)
-# output_file_handler = logging.FileHandler("latest.log")
-# log.addHandler(output_file_handler)
+fileHandler = logging.FileHandler('latest.log')
+fileHandler.setFormatter(logFormatter)
+log.addHandler(fileHandler)
 
 
 pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
@@ -44,15 +45,17 @@ OCR= {
 }
 
 class ImageTranslator():
-    """ 
-    img: path file, bytes URL, Pillow/OpenCV image and data URI\n
-    ocr: 'tesseract' or 'easyocr'\n
-    translator: 'google' , 'bing' and  'deepl'\n
-    src_lang: source language of image. See code in utils.lang\n
-    dest_lang: destination language of image. See code in utils.lang\n
+    """
+    The image translator class
     """
     def __init__(self,img,ocr,translator,src_lang,dest_lang):
-
+        """ 
+        img: path file, bytes URL, Pillow/OpenCV image and data URI\n
+        ocr: 'tesseract' or 'easyocr'\n
+        translator: 'google' , 'bing' and  'deepl'\n
+        src_lang: source language of image. See code in utils.lang\n
+        dest_lang: destination language of image. See code in utils.lang\n
+        """
         self.img= self.__reformat_input(img)
         self.img_out=self.img.copy()
         self.text=[]
@@ -146,9 +149,9 @@ class ImageTranslator():
 
             return self.__run_tesserract(paragraph,lang_code)
         log.debug(f'Run {self.ocr} ocr')
-        if self.ocr=='EasyOCR':
+        if self.ocr=='easyocr':
             return self.__run_easyocr(paragraph,lang_code)
-        elif self.ocr=='Tesseract':
+        elif self.ocr=='tesseract':
             return self.__run_tesserract(paragraph,lang_code)
 
     def __run_tesserract(self,paragraph,lang_code):
@@ -245,14 +248,14 @@ class ImageTranslator():
         Reformat the input image
         """
         if type(image) == str:
-            if image.startswith('http://') or image.startswith('https://'):
+            if image.startswith('http://') or image.startswith('https://'):     #URL 
                 #Read bytes from url
                 image=urllib.request.urlopen(image).read()
 
-            nparr = np.frombuffer(image, np.uint8)
+            nparr = np.frombuffer(image, np.uint8)                              #Bytes
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        elif type(image) == np.ndarray:
+        elif type(image) == np.ndarray:                         #OpenCV image
             if len(image.shape) == 2: 
                 img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
             elif len(image.shape) == 3 and image.shape[2] == 3:
@@ -260,6 +263,8 @@ class ImageTranslator():
             elif len(image.shape) == 3 and image.shape[2] == 4:
                 img = image[:,:,:3]
                 img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        elif isinstance(image,PIL_Img.Image):
+            img=np.asarray(image)
         else:
             log.error('Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
         return img
@@ -306,11 +311,11 @@ class ImageTranslator():
 
             return self.__run_google(text,dest_lang,src_lang)
 
-        if self.translator=='Google':
+        if self.translator=='google':
             return self.__run_google(text,dest_lang,src_lang)
-        elif self.translator=='Bing':
+        elif self.translator=='bing':
             return self.__run_bing(text,dest_lang,src_lang)
-        elif self.translator=='DeepL':
+        elif self.translator=='deepl':
             return self.__run_deepl(text,dest_lang,src_lang)
 
     def __run_google(self,text,dest_lang,src_lang):
@@ -349,12 +354,12 @@ class ImageTranslator():
         Apply the translation on img_out
         """
         log.debug('Apply translation to image')
-        im_pil = Image.fromarray(self.img_out)
-        draw = ImageDraw.Draw(im_pil)
+        im_pil = PIL_Img.fromarray(self.img_out)
+        draw=PIL_ImgDraw.Draw(im_pil)
 
         font_file_path = 'Cantarell.ttf'
         font_size=int(text['h']*1.1)
-        font = ImageFont.truetype(font_file_path, size=font_size, encoding="unic")
+        font = PIL_ImgFont.truetype(font_file_path, size=font_size, encoding="unic")
 
         lines = self.__text_wrap(text['translated_string'],font,text['max_width'])
         line_height = font.getsize('hg')[1]
@@ -365,7 +370,7 @@ class ImageTranslator():
         self.img_out = np.asarray(im_pil)
 
 
-
+PIL_Img
 test=ImageTranslator('https://i.stack.imgur.com/vrkIj.png','tesseract','google','eng','fra')
 test.processing()
 cv2.imwrite('out.jpg',test.img_out)
