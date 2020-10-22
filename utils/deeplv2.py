@@ -33,29 +33,34 @@ from pyppeteer import launch
 from pyquery import PyQuery as pq
 
 
+#Logging
 import logging
+logFormatter = logging.Formatter(
+    "[%(asctime)s] "
+    "[%(levelname)-5.5s]: "
+    "%(message)s")
+log = logging.getLogger(__name__)
 
-log = logging.getLogger()
+fileHandler = logging.FileHandler('latest.log')
+fileHandler.setFormatter(logFormatter)
+log.addHandler(fileHandler)
+
 log.setLevel(logging.DEBUG)
-
-stdout_handler = logging.StreamHandler(sys.stdout)
-log.addHandler(stdout_handler)
-# output_file_handler = logging.FileHandler("latest.log")
-# log.addHandler(output_file_handler)
-
 
 URL = r"https://www.deepl.com/translator"
 LOOP = asyncio.get_event_loop()
 
-HEADFUL=1
-DEBUG=0
+HEADFUL = 1
+DEBUG = 0
 PROXY = ""
 LOOP = asyncio.get_event_loop()
+
+
 class DeepL:
-    def __init__(self,text,dest_lang,src_lang):
-        self.src_lang=src_lang
-        self.dest_lang=dest_lang
-        self.text=text
+    def __init__(self, text, dest_lang, src_lang):
+        self.src_lang = src_lang
+        self.dest_lang = dest_lang
+        self.text = text
 
     async def get_ppbrowser(self):
         """ get a puppeeter browser.
@@ -65,7 +70,11 @@ class DeepL:
             browser = await launch(
                 args=[
                     "--disable-infobars",
-                    "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36",
+                    "--user-agent="
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+                    "AppleWebKit/537.36 (KHTML, like Gecko)"
+                    "Chrome/71.0.3578.98"
+                    "Safari/537.36",
                     "--window-size=1440x900",
                     "--disable-popup-blocking",  #
                 ],
@@ -81,9 +90,9 @@ class DeepL:
     async def deepl_tr_async(
             self,
             text: str,
-            from_lang: str = "auto",
-            to_lang: str = "auto",
-            waitfor: Optional[float] = None,
+            from_lang: str="auto",
+            to_lang: str="auto",
+            waitfor: Optional[float]=None,
     ) -> Optional[str]:
         """ deepl via pyppeteer
         from_lang = 'de'
@@ -103,13 +112,10 @@ class DeepL:
         else:
             return
 
-
         page.setDefaultNavigationTimeout(0)
 
         url_ = f"{URL}#{self.src_lang}/{self.dest_lang}/{quote(text)}"
         # url_ = f'{URL}#{from_lang}/{to_lang}/'
-
-       
 
         count = 0
         while count < 3:
@@ -128,7 +134,8 @@ class DeepL:
         # wait for input area ".lmt__source_textarea"
         try:
             # await page.waitFor(".lmt__message_box2__content")
-            await page.waitForSelector(".lmt__source_textarea", {"timeout": 1000})  # ms
+            await page.waitForSelector(".lmt__source_textarea",
+                                       {"timeout": 1000})  # ms
             log.debug("Succes getting source textarea")
         # except TimeoutError:
         except Exception as exc:
@@ -143,71 +150,58 @@ class DeepL:
         # await page.waitFor(2500)  # ms
 
         # wait for popup to be visible
-        _ = """
-        try:
-            # await page.waitFor(".lmt__message_box2__content")
-            await page.waitForSelector(".lmt__message_box2__content", {"timeout": 1000})  # ms
-        # except TimeoutError:
-        except Exception as exc:
-            if debug:
-                logger.error("Timedout: %s, waiting for 500 ms more", exc)
-            await asyncio.sleep(0.5)
-            # raise
-        """
 
         if waitfor is None:
             _ = max(100, len(text) * 3.6)
-            logging.debug(f"waiting for {_} ms")
+            log.debug(f"waiting for {_} ms")
         else:
             try:
                 _ = float(waitfor)
             except Exception as exc:
-                logging.warning(
-                    f"invalif waitfor [{waitfor}]: %s, setting to auto-adjust", waitfor, exc
+                log.warning(
+                    f"invalif waitfor [{waitfor}]: {exc},"
+                    f"setting to auto-adjust"
                 )
                 _ = max(100, len(text) * 3.6)
 
-            logging.debug("preset fixed waiting for %.1f ms", _)
-
+            log.debug("preset fixed waiting for %.1f ms", _)
+        try:
             await page.waitFor(_)
         except Exception as exc:
-            logging.warning(" page.waitFor exc: %s", exc)
+            log.warning(" page.waitFor exc: %s", exc)
         try:
             content = await page.content()
         except Exception as exc:
-            logging.warning(" page.waitFor exc: %s", exc)
+            log.warning(f" page.waitFor exc: {exc}")
             content = '<div class="lmt__target_textarea">%s</div>' % exc
-    
-        #Waiting for a fix of pyppeteer
-        #element = await page.querySelector('.lmt__target_textarea')
-        #title = await page.evaluate('(element) => element.textContent', element)
- 
+        
+        # Waiting for a fix of pyppeteer
+        # element = await page.querySelector('.lmt__target_textarea')
+        # title = await page.evaluate('(element) => element.textContent', element)
+
         count = -1
         while count < 50:
             count += 1
-            logger.debug(" extra %s x 100 ms", count + 1)
+            log.debug("extra %s x 100 ms", count + 1)
             await page.waitFor(100)
 
             content = await page.content()
             doc = pq(content)
             res = doc(".lmt__translations_as_text").text()
             if 'Alternatives' in res:
-                res=res.split('\n')[1]
+                res = res.split('\n')[1]
             if res:
                 break
             await asyncio.sleep(0)
             await asyncio.sleep(0)
 
-        logging.debug("time: %.2f s", default_timer() - then)
-
-        logging.debug("res: %s", res)
+        log.debug("time: %.2f s", default_timer() - then)
 
         await page.close()
 
         await asyncio.sleep(0.2)
 
         return res
-
 
     def translate(
             self,
@@ -224,22 +218,18 @@ class DeepL:
         if loop.is_closed():
             loop = asyncio.new_event_loop()
 
-        sents=self.text
-        self.browser=LOOP.run_until_complete(self.get_ppbrowser())
+        sents = self.text
+        self.browser = LOOP.run_until_complete(self.get_ppbrowser())
         try:
-            res = loop.run_until_complete( 
+            res = loop.run_until_complete(
                 self.deepl_tr_async(
-                self.text,
-                from_lang=self.src_lang,
-                to_lang=self.dest_lang,
-                waitfor=waitfor
-            ))
+                                    self.text,
+                                    from_lang=self.src_lang,
+                                    to_lang=self.dest_lang,
+                                    waitfor=waitfor))
         except Exception as exc:
-            logging.error(" loop.run_until_complete exc: %s", exc)
+            log.error(f"loop.run_until_complete exc: {exc}")
             res = str(exc)
 
         return res
-
-
-
 

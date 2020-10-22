@@ -32,30 +32,36 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-import logging
 
-log = logging.getLogger()
+#Logging
+import logging
+logFormatter = logging.Formatter(
+    "[%(asctime)s] "
+    "[%(levelname)-5.5s]: "
+    "%(message)s")
+log = logging.getLogger(__name__)
+
+fileHandler = logging.FileHandler('latest.log')
+fileHandler.setFormatter(logFormatter)
+log.addHandler(fileHandler)
+
 log.setLevel(logging.DEBUG)
 
-stdout_handler = logging.StreamHandler(sys.stdout)
-log.addHandler(stdout_handler)
-# output_file_handler = logging.FileHandler("latest.log")
-# log.addHandler(output_file_handler)
-
-
-
+URL = r"https://www.deepl.com/translator"
 
 class DeepLArgCheckingError(Exception):
     pass
 
+
 class DeepLPageLoadError(Exception):
     pass
 
+
 class DeepL:
-    def __init__(self,text,dest_lang,src_lang):
-        self.src_lang=src_lang
-        self.dest_lang=dest_lang
-        self.text=text
+    def __init__(self, text, dest_lang, src_lang):
+        self.src_lang = src_lang
+        self.dest_lang = dest_lang
+        self.text = text
 
     def internet_on(self):
         """Check an internet connection."""
@@ -69,8 +75,6 @@ class DeepL:
     def validate(self):
         """Check cmdarg and stdin."""
 
-        fr_langs = {'', 'auto', 'ja', 'en', 'de', 'fr', 'es', 'pt', 'it', 'nl', 'pl', 'ru', 'zh'}
-        to_langs = fr_langs - {'', 'auto'}
 
         if self.src_lang == self.dest_lang:
             # raise err if <fr:lang> == <to:lang>
@@ -79,12 +83,12 @@ class DeepL:
 
         if len(self.text) > 5000:
             # raise err if stdin > 5000 chr
-            log.error(f'Limit of text input is 5000 chars (Now: {len(self.text)} chars)')
-            raise DeepLArgCheckingError(f'Limit of text input is 5000 chars (Now: {len(self.text)} chars)')
+            log.error(f'Limit of text input is 5000 chars ' 
+                      f'(Now: {len(self.text)} chars)')
+            raise DeepLArgCheckingError(f'Limit of text input is 5000 chars'
+                                        f'(Now: {len(self.text)} chars)')
 
-        self.fr_lang = ('auto' if   self.src_lang[0] == ''
-                               else self.src_lang[0]
-                       )[0]
+        self.fr_lang = self.src_lang
         self.to_lang = self.dest_lang
 
     def translate(self):
@@ -95,7 +99,7 @@ class DeepL:
             raise DeepLPageLoadError(f'Your network seem to be offline.')
 
         self.validate()
-        
+
         o = Options()
         # o.binary_location = '/usr/bin/google-chrome'
         o.add_argument('--headless')    # if commented. window will be open
@@ -103,16 +107,18 @@ class DeepL:
         o.add_argument('--disable-dev-shm-usage')
         o.add_argument('--remote-debugging-port=9222')
         o.add_argument('--disable-setuid-sandbox')
-        o.add_argument('--user-agent='\
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like Mac OS X) '\
-            'AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0 Mobile/14C92 Safari/602.1'
-        )
+        o.add_argument('--user-agent='
+                       'Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like Mac OS X)'
+                       'AppleWebKit/602.3.12 (KHTML, like Gecko)'
+                       'Version/10.0 Mobile/14C92 Safari/602.1'
+                       )
 
         d = webdriver.Chrome(
              executable_path="D:/Programs/chromedriver.exe",
              options=o
         )
-        d.get('https://www.deepl.com/translator#%s/%s/_'%(self.fr_lang, self.to_lang))
+        url_ = f"{URL}#{self.fr_lang}/{self.to_lang}/"
+        d.get(url_)
         try:
             WebDriverWait(d, 15).until(
                 EC.presence_of_all_elements_located
@@ -128,7 +134,7 @@ class DeepL:
         input_area.send_keys(self.text)
 
         # Wait for the translation process
-        time.sleep(10) # fix needed
+        time.sleep(10)  # fix needed
 
         output_area = d.find_element_by_xpath(
             '//textarea[@dl-test="translator-target-input"]'
@@ -137,4 +143,5 @@ class DeepL:
         d.quit()
         return res
 
-
+tra =DeepL('This is a test','en','fr')
+print(tra.translate()) 
