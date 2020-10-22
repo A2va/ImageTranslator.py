@@ -69,7 +69,37 @@ class ImageTranslator():
         self.src_lang = src_lang
         self.dest_lang = dest_lang
 
+    def translate(self):
+        if self.img_out !=None
+            self.img_out=img.copy()
+            self.processing()
+        for i in range(0, len(self.text)):
+            if self.text[i]['string'] != '':
+                self.__apply_translation(self.text[i])
+        return self.img_out
+
+    def get_text(self):
+        return self.text
+
     def processing(self):
+        self.mask_paragraph = self.__detect_text(self.img)
+        paragraphs = self.__detect_paragraph()
+        # Apply Binarization and ocr
+        for paragraph in paragraphs:
+            binary = TextBin(paragraph['image'])
+            paragraph['image'] = binary.run()
+
+            self.text.append(self.__run_ocr(paragraph))
+        for i in range(0, len(self.text)):
+            x = self.text[i]['x']
+            y = self.text[i]['y']
+            w = self.text[i]['paragraph_w']
+            h = self.text[i]['paragraph_h']
+            if self.text[i]['string'] != '':
+                cv2.rectangle(self.img_out, (x, y), (x+w, y+h), (255, 255, 255), -1)
+                self.text[i] = self.__run_translator(self.text[i])
+
+    def __run(self):
         self.mask_paragraph = self.__detect_text(self.img)
         paragraphs = self.__detect_paragraph()
         # Apply Binarization and ocr
@@ -149,7 +179,10 @@ class ImageTranslator():
         """
         Run the selected OCR
         """
-        lang_code = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
+        try:
+            lang_code = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
+        except:
+            log.error(f'Language {self.ocr} is not available')
         if lang_code == 'invalid':
             log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
                         f'Switch to tesseract')
@@ -313,8 +346,11 @@ class ImageTranslator():
         Run translator between Google, Bing and DeepL
         """
         log.debug(f'Run {self.translator} translator')
-        src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
-        dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
+        try:
+            src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
+            dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
+        except:
+            log.error(f'Language {self.dest_lang} is not available')
         if src_lang == 'invalid' or dest_lang == 'invalid':
             log.warning(f'The {self.translator} ocr has no {self.src_lang}'
                         f'or {self.dest_lang}.Switch to google')
