@@ -7,4 +7,4 @@ List of packages:
 * Googletrans
 * Pytesseract
 
-The text binarizatio comes from this [repository](https://github.com/jasonlfunk/ocr-text-extraction) and the algorithm comes from this [paper](http://www.m.cs.osakafu-u.ac.jp/cbdar2007/proceedings/papers/O1-1.pdf).
+The text binarization comes from this [repository](https://github.com/jasonlfunk/ocr-text-extraction) and the algorithm comes from this [paper](http://www.m.cs.osakafu-u.ac.jp/cbdar2007/proceedings/papers/O1-1.pdf).
