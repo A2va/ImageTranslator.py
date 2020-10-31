@@ -1,10 +1,30 @@
 
+# Copyright (c) 2012, Jason Funk <jasonlfunk@gmail.com>
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+# and associated documentation files (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all copies or substantial
+# portions of the Software.
+ 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+# LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# https://github.com/jasonlfunk/ocr-text-extraction
 import cv2
 import numpy as np
-DEBUG=0
+
+import logging
+log = logging.getLogger('image_translator')
+
+
 MAXBLOCKSIZE = 3000
 
-class textBin():
+class TextBin():
 
     def __init__(self,img):
         self.orig_img=img
@@ -15,9 +35,7 @@ class textBin():
         self.contours=None
 
     def ii(self,xx, yy):
-        # global img, img_y, img_x
         if yy >= self.img_y or xx >= self.img_x:
-            #print "pixel out of bounds ("+str(y)+","+str(x)+")"
             return 0
         pixel = self.img[yy][xx]
         return 0.30 * pixel[2] + 0.59 * pixel[1] + 0.11 * pixel[0]
@@ -94,45 +112,28 @@ class textBin():
         # Test it's shape - if it's too oblong or tall it's
         # probably not a real character
         if w_ / h_ < 0.1 or w_ / h_ > 10:
-            if DEBUG:
-                print("\t Rejected because of shape: (" + str(xx) + "," + str(yy) + "," + str(w_) + "," + str(h_) + ")" + \
-                    str(w_ / h_))
             return False
         
         # check size of the box
         if ((w_ * h_) > (MAXBLOCKSIZE)) or ((w_ * h_) < 15):
-            if DEBUG:
-                print("\t Rejected because of size")
             return False
 
         return True
 
     def include_box(self,index, h_, contour):
-        if DEBUG:
-            print(str(index) + ":")
-            if self.is_child(index, h_):
-                print("\tIs a child")
-                print("\tparent " + str(self.get_parent(index, h_)) + " has " + str(
-                    self.count_children(get_parent(index, h_), h_, contour)) + " children")
-                print("\thas " + str(self.count_children(index, h_, contour)) + " children")
 
         if self.is_child(index, h_) and self.count_children(self.get_parent(index, h_), h_, contour) <= 4:
-            if DEBUG:
-                print("\t skipping: is an interior to a letter")
             return False
 
         if self.count_children(index, h_, contour) > 4:
-            if DEBUG:
-                print("\t skipping, is a container of letters")
             return False
 
-        if DEBUG:
-            print("\t keeping")
         return True
 
 
-    def processing(self):
-
+    def run(self):
+        log.debug('Start text binarization')
+        
         blue, green, red = cv2.split(self.img)
 
         # Run canny edge detection on each channel
@@ -148,33 +149,19 @@ class textBin():
 
         hierarchy = hierarchy[0]
 
-        if DEBUG:
-            processed = edges.copy()
-            rejected = edges.copy()
-
         # These are the boxes that we are determining
         keepers = []
 
         # For each contour, find the bounding rectangle and decide
         # if it's one we care about
         for index_, contour_ in enumerate(self.contours):
-            if DEBUG:
-                print("Processing #%d" % index_)
-
+    
             x, y, w, h = cv2.boundingRect(contour_)
 
             # Check the contour and it's bounding box
             if self.keep(contour_) and self.include_box(index_, hierarchy, contour_):
                 # It's a winner!
                 keepers.append([contour_, [x, y, w, h]])
-                if DEBUG:
-                    cv2.rectangle(processed, (x, y), (x + w, y + h), (100, 100, 100), 1)
-                    cv2.putText(processed, str(index_), (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255))
-            else:
-                if DEBUG:
-                    cv2.rectangle(rejected, (x, y), (x + w, y + h), (100, 100, 100), 1)
-                    cv2.putText(rejected, str(index_), (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255))
-
         # Make a white copy of our image
         new_image = edges.copy()
         new_image.fill(255)
@@ -190,8 +177,6 @@ class textBin():
                 fg_int += self.ii(p[0][0], p[0][1])
 
             fg_int /= len(contour_)
-            if DEBUG:
-                print("FG Intensity for #%d = %d" % (index_, fg_int))
 
             # Find the intensity of three pixels going around the
             # outside of each corner of the bounding box to determine
@@ -224,9 +209,6 @@ class textBin():
             # pixels determined above
             bg_int = np.median(bg_int)
 
-            if DEBUG:
-                print("BG Intensity for #%d = %s" % (index_, repr(bg_int)))
-
             # Determine if the box should be inverted
             if fg_int >= bg_int:
                 fg = 255
@@ -240,19 +222,12 @@ class textBin():
             for x in range(x_, x_ + width):
                 for y in range(y_, y_ + height):
                     if y >= self.img_y or x >= self.img_x:
-                        if DEBUG:
-                            print("pixel out of bounds (%d,%d)" % (y, x))
                         continue
                     if self.ii(x, y) > fg_int:
                         new_image[y][x] = bg
                     else:
                         new_image[y][x] = fg
-
+        log.debug('End of text binarization')
         # blur a bit to improve ocr accuracy
         new_image = cv2.blur(new_image, (2, 2))
-        cv2.imwrite('font.jpg', new_image)
-        if DEBUG:
-            cv2.imwrite('edges.png', edges)
-            cv2.imwrite('processed.png', processed)
-            cv2.imwrite('rejected.png', rejected)
         return new_image
