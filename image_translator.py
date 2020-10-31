@@ -50,6 +50,8 @@ OCR = {
     'easyOCR': 1
 }
 
+class UnknownLanguage(Exception):
+    pass
 
 class ImageTranslator():
     """
@@ -167,6 +169,7 @@ class ImageTranslator():
             lang_code = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
         except:
             log.error(f'Language {self.ocr} is not available')
+            raise UnknownLanguage(f'Language {self.ocr} is not available')
         if lang_code == 'invalid':
             log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
                         f'Switch to tesseract')
@@ -335,6 +338,7 @@ class ImageTranslator():
             dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
         except:
             log.error(f'Language {self.dest_lang} is not available')
+            raise UnknownLanguage(f'Language {self.dest_lang} is not available')
         if src_lang == 'invalid' or dest_lang == 'invalid':
             log.warning(f'The {self.translator} ocr has no {self.src_lang}'
                         f'or {self.dest_lang}.Switch to google')
