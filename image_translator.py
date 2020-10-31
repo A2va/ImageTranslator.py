@@ -1,6 +1,5 @@
 # Image
 import cv2
-import pytesseract
 import numpy as np
 
 import PIL.Image as PIL_Img
@@ -11,6 +10,9 @@ import PIL.ImageDraw as PIL_ImgDraw
 # Text detector
 import craft_text_detector as craft_detector
 
+#OCR
+import easyocr
+import pytesseract
 from text_binarization import TextBin
 # Translator
 from googletrans import Translator
@@ -24,11 +26,12 @@ import urllib
 # Logging
 import sys
 import logging
+
 logFormatter = logging.Formatter(
     "[%(asctime)s] "
     "[%(levelname)-5.5s]: "
     "%(message)s")
-log = logging.getLogger(__name__)
+log = logging.getLogger('image_translator')
 fileHandler = logging.FileHandler('latest.log')
 fileHandler.setFormatter(logFormatter)
 log.addHandler(fileHandler)
@@ -61,7 +64,7 @@ class ImageTranslator():
         dest_lang: destination language of image. See code in utils.lang\n
         """
         self.img = self.__reformat_input(img)
-        self.img_out = self.img.copy()
+        self.img_out = None
         self.text = []
         self.mask_paragraph = None
         self.ocr = ocr
@@ -70,9 +73,10 @@ class ImageTranslator():
         self.dest_lang = dest_lang
 
     def translate(self):
-        if self.img_out !=None
-            self.img_out=img.copy()
+        if self.img_out == None:
+            self.img_out=self.img.copy()
             self.processing()
+        log.debug('Apply translation to image')
         for i in range(0, len(self.text)):
             if self.text[i]['string'] != '':
                 self.__apply_translation(self.text[i])
@@ -98,26 +102,6 @@ class ImageTranslator():
             if self.text[i]['string'] != '':
                 cv2.rectangle(self.img_out, (x, y), (x+w, y+h), (255, 255, 255), -1)
                 self.text[i] = self.__run_translator(self.text[i])
-
-    def __run(self):
-        self.mask_paragraph = self.__detect_text(self.img)
-        paragraphs = self.__detect_paragraph()
-        # Apply Binarization and ocr
-        for paragraph in paragraphs:
-            binary = TextBin(paragraph['image'])
-            paragraph['image'] = binary.run()
-
-            self.text.append(self.__run_ocr(paragraph))
-
-        for i in range(0, len(self.text)):
-            x = self.text[i]['x']
-            y = self.text[i]['y']
-            w = self.text[i]['paragraph_w']
-            h = self.text[i]['paragraph_h']
-            if self.text[i]['string'] != '':
-                cv2.rectangle(self.img_out, (x, y), (x+w, y+h), (255, 255, 255), -1)
-                self.text[i] = self.__run_translator(self.text[i])
-                self.__apply_translation(self.text[i])
                 
     def __detect_text(self, img):
         """
@@ -237,7 +221,7 @@ class ImageTranslator():
                 'max_width': paragraph['w']
                 }
 
-    def __run_easyocr(self, paragraph):
+    def __run_easyocr(self, paragraph,lang_code):
         """
         Run EasyOCR
         """
@@ -402,7 +386,6 @@ class ImageTranslator():
         """
         Apply the translation on img_out
         """
-        log.debug('Apply translation to image')
         im_pil = PIL_Img.fromarray(self.img_out)
         draw = PIL_ImgDraw.Draw(im_pil)
 
@@ -426,4 +409,5 @@ class ImageTranslator():
 
 test = ImageTranslator('https://i.stack.imgur.com/vrkIj.png', 'tesseract', 'deepl', 'eng', 'fra')
 test.processing()
+test.translate()
 cv2.imwrite('out.jpg', test.img_out)

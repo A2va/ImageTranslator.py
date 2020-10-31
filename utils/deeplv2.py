@@ -35,17 +35,8 @@ from pyquery import PyQuery as pq
 
 #Logging
 import logging
-logFormatter = logging.Formatter(
-    "[%(asctime)s] "
-    "[%(levelname)-5.5s]: "
-    "%(message)s")
-log = logging.getLogger(__name__)
+log = logging.getLogger('image_translator')
 
-fileHandler = logging.FileHandler('latest.log')
-fileHandler.setFormatter(logFormatter)
-log.addHandler(fileHandler)
-
-log.setLevel(logging.DEBUG)
 
 URL = r"https://www.deepl.com/translator"
 LOOP = asyncio.get_event_loop()
@@ -124,7 +115,7 @@ class DeepL:
                 await page.goto(url_, {"timeout": 90 * 1000})
                 break
             except Exception as exc:
-                await syncio.sleep(0)
+                await asyncio.sleep(0)
                 page = await self.browser.newPage()
                 log.warning(f"page.goto exc: {str(exc)}, attempt {count}")
         else:

@@ -35,23 +35,13 @@ from selenium.common.exceptions import TimeoutException
 
 #Logging
 import logging
-logFormatter = logging.Formatter(
-    "[%(asctime)s] "
-    "[%(levelname)-5.5s]: "
-    "%(message)s")
-log = logging.getLogger(__name__)
+log = logging.getLogger('image_translator')
 
-fileHandler = logging.FileHandler('latest.log')
-fileHandler.setFormatter(logFormatter)
-log.addHandler(fileHandler)
-
-log.setLevel(logging.DEBUG)
 
 URL = r"https://www.deepl.com/translator"
 
 class DeepLArgCheckingError(Exception):
     pass
-
 
 class DeepLPageLoadError(Exception):
     pass
@@ -125,7 +115,7 @@ class DeepL:
             )
         except TimeoutException as te:
             log.error(f'Timeout exception')
-            raise DeepLCLIPageLoadError(te)
+            raise DeepLPageLoadError(te)
 
         input_area = d.find_element_by_xpath(
             '//textarea[@dl-test="translator-source-input"]'
