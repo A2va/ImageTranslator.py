@@ -3,3 +3,7 @@ Pillow
 googletrans
 pytesseract
 PyBinglate
+pyppeteer
+pyquery
+easyocr
+craft-text-detector

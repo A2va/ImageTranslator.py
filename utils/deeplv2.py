@@ -42,7 +42,6 @@ URL = r"https://www.deepl.com/translator"
 LOOP = asyncio.get_event_loop()
 
 HEADFUL = 1
-DEBUG = 0
 PROXY = ""
 LOOP = asyncio.get_event_loop()
 
