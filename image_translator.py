@@ -13,7 +13,7 @@ import craft_text_detector as craft_detector
 #OCR
 import easyocr
 import pytesseract
-from text_binarization import TextBin
+from utils.text_binarization import TextBin
 # Translator
 from googletrans import Translator
 from PyBinglate import BingTranslator
@@ -250,7 +250,8 @@ class ImageTranslator():
                 'paragraph_h': paragraph['h'] + 20,
                 'string': string,
                 'image':  paragraph['image'],
-                'max_width': paragraph['w']
+                'max_width': paragraph['w'],
+                'font_zize': h*1.1      #Only for Cantarell -> Find a solution for all fonts
             }
 
     def __craft(self, img):
