@@ -411,8 +411,3 @@ class ImageTranslator():
             draw.text((text['x'], y), line, fill=(0, 0, 0), font=font)
             y = y + line_height
         self.img_out = np.asarray(im_pil)
-
-test = ImageTranslator('https://i.stack.imgur.com/vrkIj.png', 'tesseract', 'deepl', 'eng', 'fra')
-test.processing()
-test.translate()
-cv2.imwrite('out.jpg', test.img_out)
