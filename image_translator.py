@@ -174,8 +174,8 @@ class ImageTranslator():
             log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
                         f'Switch to tesseract')
             lang_code = lang.OCR_LANG[self.src_lang][OCR['tesseract']]
-
             return self.__run_tesserract(paragraph, lang_code)
+            
         log.debug(f'Run {self.ocr} ocr')
         if self.ocr == 'easyocr':
             return self.__run_easyocr(paragraph, lang_code)
