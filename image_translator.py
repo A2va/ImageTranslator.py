@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Image
 import cv2
 import numpy as np
@@ -13,12 +14,12 @@ import craft_text_detector as craft_detector
 #OCR
 import easyocr
 import pytesseract
-from utils.text_binarization import TextBin
+from .utils.text_binarization import TextBin
 # Translator
 from googletrans import Translator
 from PyBinglate import BingTranslator
-from utils.deeplv2 import DeepL
-import utils.lang as lang
+from .utils.deeplv2 import DeepL
+from .utils import lang
 
 
 import urllib
