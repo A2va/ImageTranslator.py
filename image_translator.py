@@ -395,7 +395,7 @@ class ImageTranslator():
         im_pil = PIL_Img.fromarray(self.img_out)
         draw = PIL_ImgDraw.Draw(im_pil)
 
-        font_file_path = 'Cantarell.ttf'
+        font_file_path = 'font/Cantarell.ttf'
         font_size = int(text['h']*1.1)
         font = PIL_ImgFont.truetype(
             font_file_path,
