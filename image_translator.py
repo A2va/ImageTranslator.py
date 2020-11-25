@@ -39,7 +39,7 @@ log.addHandler(fileHandler)
 
 log.setLevel(logging.DEBUG)
 
-pytesseract.pytesseract.tesseract_cmd = 'D:/Programs/tesseract-ocr/tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
 
 TRANS = {
     'google': 0,
@@ -397,6 +397,7 @@ class ImageTranslator():
 
         font_file_path = 'font/Cantarell.ttf'
         font_size = int(text['h']*1.1)
+        text['size']=font_size
         font = PIL_ImgFont.truetype(
             font_file_path,
             size=font_size,
