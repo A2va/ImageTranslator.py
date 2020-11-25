@@ -77,7 +77,6 @@ class ImageTranslator():
 
     def translate(self):
         if self.img_out == None:
-            self.img_out=self.img.copy()
             self.processing()
         log.debug('Apply translation to image')
         for i in range(0, len(self.text)):
@@ -89,6 +88,7 @@ class ImageTranslator():
         return self.text
 
     def processing(self):
+        self.img_out=self.img.copy()
         self.mask_paragraph = self.__detect_text(self.img)
         paragraphs = self.__detect_paragraph()
         # Apply Binarization and ocr
