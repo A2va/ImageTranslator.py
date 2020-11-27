@@ -222,7 +222,8 @@ class ImageTranslator():
                 'paragraph_h': paragraph['h'] + 20,
                 'string': string,
                 'image': paragraph['image'],
-                'max_width': paragraph['w']
+                'max_width': paragraph['w'],
+                'font_zize': int(h*1.1)      #Only for Cantarell -> Find a solution for all fonts
                 }
 
     def __run_easyocr(self, paragraph,lang_code):
@@ -252,7 +253,7 @@ class ImageTranslator():
                 'string': string,
                 'image':  paragraph['image'],
                 'max_width': paragraph['w'],
-                'font_zize': h*1.1      #Only for Cantarell -> Find a solution for all fonts
+                'font_zize': int(h*1.1)      #Only for Cantarell -> Find a solution for all fonts
             }
 
     def __craft(self, img):
@@ -396,11 +397,10 @@ class ImageTranslator():
         draw = PIL_ImgDraw.Draw(im_pil)
 
         font_file_path = 'font/Cantarell.ttf'
-        font_size = int(text['h']*1.1)
-        text['size']=font_size
+
         font = PIL_ImgFont.truetype(
             font_file_path,
-            size=font_size,
+            size=text['font_size'],
             encoding="unic")
 
         lines = self.__text_wrap(
