@@ -214,8 +214,8 @@ class ImageTranslator():
                         first = False
                     string = string + str(b[11])+' '
         return {
-                'x': x + paragraph['x'] - 45,
-                'y': y + paragraph['y'] - 20,
+                'x': x + paragraph['x'] - 40,
+                'y': y + paragraph['y'] - 15,
                 'w': w,
                 'h': h,
                 'paragraph_w': paragraph['w'] + 20,
@@ -244,8 +244,8 @@ class ImageTranslator():
         for res in result:
             string += res[1]
         return {
-                'x': x + paragraph['x'] - 45,
-                'y': y + paragraph['y'] - 20,
+                'x': x + paragraph['x'] - 40,
+                'y': y + paragraph['y'] - 15,
                 'w': w,
                 'h': h,
                 'paragraph_w': paragraph['w'] + 20,
