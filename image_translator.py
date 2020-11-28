@@ -76,7 +76,7 @@ class ImageTranslator():
         self.dest_lang = dest_lang
 
     def translate(self):
-        if self.img_out == None:
+        if self.img_out is None:
             self.processing()
         log.debug('Apply translation to image')
         for i in range(0, len(self.text)):
