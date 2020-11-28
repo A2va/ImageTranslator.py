@@ -104,7 +104,7 @@ class ImageTranslator():
             h = self.text[i]['paragraph_h']
             if self.text[i]['string'] != '':
                 cv2.rectangle(self.img_out, (x, y), (x+w, y+h), (255, 255, 255), -1)
-                self.text[i] = self.__run_translator(self.text[i])
+                self.text[i]['translated_string'] = self.run_translator(self.text[i]['string'])
                 
     def __detect_text(self, img):
         """
@@ -331,7 +331,7 @@ class ImageTranslator():
                 lines.append(line)
         return lines
 
-    def __run_translator(self, text):
+    def run_translator(self, text):
         """
         Run translator between Google, Bing and DeepL
         """
@@ -363,31 +363,27 @@ class ImageTranslator():
         """
         tra = Translator()
 
-        string = tra.translate(text['string'], dest_lang, src_lang).text
-        text['translated_string'] = string
+        string = tra.translate(text, dest_lang, src_lang).text
 
-        return text
+        return string
 
     def __run_bing(self, text, dest_lang, src_lang):
         """
         Run bing translator
         """
         tra = BingTranslator()
-        string = tra.translate(text['string'], dest_lang, src_lang)
+        string = tra.translate(text, dest_lang, src_lang)
 
-        text['translated_string'] = string
-
-        return text
+        return string
 
     def __run_deepl(self, text, dest_lang, src_lang):
         """
         Run deepl translator
         """
-        tra = DeepL(text['string'], dest_lang, src_lang)
+        tra = DeepL(text, dest_lang, src_lang)
         string = tra.translate()
-        text['translated_string'] = string
 
-        return text
+        return string
 
     def __apply_translation(self, text):
         """
