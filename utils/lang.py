@@ -116,7 +116,7 @@ TRANS_LANG={
     'vie': ['vi','vi','invalid'],               #Vietnamese
 
     'yid': ['yi','invalid','invalid'],          #Yiddish
-    'yor': ['yo','invalid','invalid']          #Yoruba
+    'yor': ['yo','invalid','invalid']           #Yoruba
 
     #'zul': ['zu'],                             #Zulu
     #'xho': ['xh'],                             #Xhosa
@@ -155,7 +155,7 @@ OCR_LANG={
     #'asm': ['asm','as'],                       #Assamese
     #'ava':['invalid','ava'],                   #Avar
     'aze': ['aze','az'],                        #Azerbaijani
-    'aze_cyrl': ['aze_cyrl','invalid'],  
+    #'aze_cyrl': ['aze_cyrl','invalid'],        #Azerbaijani (cyrillic)
     #'bih': ['invalid','bh'],                   #Bihari      
     'bel': ['bel','be'],                        #Belarusian
     'ben': ['ben','bn'],                        #Bengali
@@ -190,7 +190,7 @@ OCR_LANG={
     'fin': ['fin','invalid'],                   #Finnish
     'fra': ['fra','fr'],                        #French
     'frk': ['frk','invalid'],                   #Frankish 
-    'frm': ['frm','invalid'],                   #French (middle)
+    #'frm': ['frm','invalid'],                  #French (middle)
     'fry': ['fry','invalid'],                   #Frisian (western)
     'gla': ['gla','invalid'],                   #Scottish Gaelic
     'gle': ['gle','ga'],                        #Irish
@@ -209,13 +209,13 @@ OCR_LANG={
     #'inh': ['invalid','inh'],                  #Ingush
     'isl': ['isl','is'],                        #Icelandic
     'ita': ['ita','it'],                        #Italian
-    'ita_old': ['ita_old','invalid'],           #Italian (old)
+    #'ita_old': ['ita_old','invalid'],          #Italian (old)
     'jav': ['jav','invalid'],                   #Javanese
     'jpn': ['jpn','jp'],                        #Japanese
     'jpn_vert': ['jpn_vert','invalid'],         #Japanese (vertical)
     'kan': ['kan','invalid'],                   #Kannada
     'kat': ['kat','invalid'],                   #Georgian
-    'kat_old': ['kat_old','invalid'],           #Georgian (old)
+    #'kat_old': ['kat_old','invalid'],          #Georgian (old)
     'kaz': ['kaz','invalid'],                   #Kazakh
     #'kdb': ['invalid','kdb'],                  #Kabardian
     'khm': ['khm','invalid'],                   #Khmer
@@ -260,7 +260,7 @@ OCR_LANG={
     'slv': ['slv','sl'],                        #Slovenian 
     'snd': ['snd','invalid'],                   #Sindhi 
     'spa': ['spa','es'],                        #Spanish 
-    'spa_old': ['spa_old'],                     #Spanish (old)
+    #'spa_old': ['spa_old'],                    #Spanish (old)
     'sqi': ['sqi','sq'],                        #Albanian 
     'srp': ['srp','rs_cyrillic'],               #Serbian (cyrillic)
     'srp_latn': ['srp_latn','rs_latin'],        #Serbian (latin)
