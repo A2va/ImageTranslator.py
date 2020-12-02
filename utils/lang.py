@@ -170,7 +170,7 @@ OCR_LANG={
     'chi_sim': ['chi_sim','ch_sim'],            #Chinese (simplified)
     'chi_sim_vert': ['chi_sim_vert','invalid'], #Chinese vertical (simplified)
     'chi_tra':['chi_tra','ch_tra'],             #Chinese (traditional)
-    'chi_tra_vert': ['chi_tra_vert','invalid'], #Chinese verctical (traditional) 
+    'chi_tra_vert': ['chi_tra_vert','invalid'], #Chinese vertical (traditional) 
     #'chr': ['chr','invalid'],                  #Cherokee
     'cos': ['cos','invalid'],                   #Corsican
     'cym': ['invalid','cy'],                    #Welsh
