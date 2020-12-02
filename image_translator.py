@@ -66,7 +66,7 @@ class ImageTranslator():
         src_lang: source language of image. See code in utils.lang\n
         dest_lang: destination language of image. See code in utils.lang\n
         """
-        self.img = self.__reformat_input(img)
+        self.img = ImageTranslator.reformat_input(img)
         self.img_out = None
         self.text = []
         self.mask_paragraph = None
@@ -74,7 +74,6 @@ class ImageTranslator():
         self.translator = translator
         self.src_lang = src_lang
         self.dest_lang = dest_lang
-
     def translate(self):
         if self.img_out is None:
             self.processing()
@@ -276,7 +275,8 @@ class ImageTranslator():
 
         return prediction_result
 
-    def __reformat_input(self, image):
+    @staticmethod
+    def reformat_input(image):
         """
         Reformat the input image
         """
