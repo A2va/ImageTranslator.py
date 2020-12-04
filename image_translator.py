@@ -37,7 +37,7 @@ fileHandler = logging.FileHandler('latest.log')
 fileHandler.setFormatter(logFormatter)
 log.addHandler(fileHandler)
 
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.WARNING)
 
 pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
 
