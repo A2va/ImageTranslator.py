@@ -4,7 +4,7 @@ List of packages:
 * [OpenCV](https://github.com/skvark/opencv-python)
 * [Pillow](https://github.com/python-pillow/Pillow)
 * [Craft text detector](https://github.com/fcakyon/craft-text-detector)
-* [Googletrans]((https://github.com/ssut/py-googletrans)
+* [Googletrans](https://github.com/ssut/py-googletrans)
 * [Pytesseract](https://github.com/madmaze/pytesseract)
 * [EasyOCR](https://github.com/JaidedAI/EasyOCR)
 
