@@ -48,7 +48,7 @@ TRANS = {
 }
 OCR = {
     'tesseract': 0,
-    'easyOCR': 1
+    'easyocr': 1
 }
 
 class UnknownLanguage(Exception):
