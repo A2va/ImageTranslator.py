@@ -28,12 +28,12 @@ import craft_text_detector as craft_detector
 #OCR
 import easyocr
 import pytesseract
-from .utils.text_binarization import TextBin
+from image_translator.utils.text_binarization import TextBin
 # Translator
 from googletrans import Translator
 from PyBinglate import BingTranslator
-from .utils.deeplv2 import DeepL
-from .utils import lang
+from image_translator.utils.deeplv2 import DeepL
+from image_translator.utils import lang
 
 
 import urllib
