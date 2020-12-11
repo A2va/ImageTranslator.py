@@ -311,6 +311,7 @@ class ImageTranslator():
         """
         Reformat the input image
         """
+        img=None
         if type(image) == str:
             # URL
             if image.startswith('http://') or image.startswith('https://'):
