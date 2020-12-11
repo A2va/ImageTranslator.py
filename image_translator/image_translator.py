@@ -88,6 +88,33 @@ class ImageTranslator():
         self.translator = translator
         self.src_lang = src_lang
         self.dest_lang = dest_lang
+
+
+        #Test the language code for ocr and translator
+        try:
+            self.ocr_lang = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
+        except:
+            log.error(f'Language {self.ocr} is not available')
+            raise UnknownLanguage(f'Language {self.ocr} is not available')
+        if self.ocr_lang == 'invalid':
+            log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
+                        f'Switch to tesseract')
+            lang_code = lang.OCR_LANG[self.src_lang][OCR['tesseract']]
+            self.ocr='tesseract'
+
+        try:
+            self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
+            self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
+        except:
+            log.error(f'Language {self.dest_lang} is not available')
+            raise UnknownLanguage(f'Language {self.dest_lang} is not available')
+        if src_lang == 'invalid' or dest_lang == 'invalid':
+            log.warning(f'The {self.translator} ocr has no {self.src_lang}'
+                        f'or {self.dest_lang}.Switch to google')
+            self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS['google']]
+            self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
+            self.translator='google'
+
     def translate(self):
         if self.img_out is None:
             self.processing()
@@ -179,22 +206,12 @@ class ImageTranslator():
         """
         Run the selected OCR
         """
-        try:
-            lang_code = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
-        except:
-            log.error(f'Language {self.ocr} is not available')
-            raise UnknownLanguage(f'Language {self.ocr} is not available')
-        if lang_code == 'invalid':
-            log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
-                        f'Switch to tesseract')
-            lang_code = lang.OCR_LANG[self.src_lang][OCR['tesseract']]
-            return self.__run_tesserract(paragraph, lang_code)
             
         log.debug(f'Run {self.ocr} ocr')
         if self.ocr == 'easyocr':
-            return self.__run_easyocr(paragraph, lang_code)
+            return self.__run_easyocr(paragraph, self.ocr_lang)
         elif self.ocr == 'tesseract':
-            return self.__run_tesserract(paragraph, lang_code)
+            return self.__run_tesserract(paragraph, self.ocr_lang)
 
     def __run_tesserract(self, paragraph, lang_code):
         """
@@ -349,27 +366,13 @@ class ImageTranslator():
         """
         Run translator between Google, Bing and DeepL
         """
-        log.debug(f'Run {self.translator} translator')
-        try:
-            src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
-            dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
-        except:
-            log.error(f'Language {self.dest_lang} is not available')
-            raise UnknownLanguage(f'Language {self.dest_lang} is not available')
-        if src_lang == 'invalid' or dest_lang == 'invalid':
-            log.warning(f'The {self.translator} ocr has no {self.src_lang}'
-                        f'or {self.dest_lang}.Switch to google')
-            src_lang = lang.TRANS_LANG[self.src_lang][TRANS['google']]
-            dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
-
-            return self.__run_google(text, dest_lang, src_lang)
 
         if self.translator == 'google':
-            return self.__run_google(text, dest_lang, src_lang)
+            return self.__run_google(text, self.trans_dest_lang, self.trans_src_lang)
         elif self.translator == 'bing':
-            return self.__run_bing(text, dest_lang, src_lang)
+            return self.__run_bing(text, self.trans_dest_lang, self.trans_src_lang)
         elif self.translator == 'deepl':
-            return self.__run_deepl(text, dest_lang, src_lang)
+            return self.__run_deepl(text, self.trans_dest_lang, self.trans_src_lang)
 
     def __run_google(self, text, dest_lang, src_lang):
         """
