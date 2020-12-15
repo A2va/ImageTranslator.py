@@ -35,11 +35,11 @@ from PyBinglate import BingTranslator
 from image_translator.utils.deeplv2 import DeepL
 from image_translator.utils import lang
 
+import sys
 
 import urllib
 
 # Logging
-import sys
 import logging
 
 logFormatter = logging.Formatter(
@@ -53,7 +53,8 @@ log.addHandler(fileHandler)
 
 log.setLevel(logging.WARNING)
 
-pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
+if sys.platform=='win32':
+    pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
 
 TRANS = {
     'google': 0,
