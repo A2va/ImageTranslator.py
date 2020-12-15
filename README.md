@@ -34,7 +34,7 @@ image_out=translator.img_out
 ## Windows
 1. Install the package
 ```
-pip3 git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
+pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
 ```
 2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
 3. Extract the files into executable (ex: 7-Zip)
