@@ -1,5 +1,7 @@
 # ImageTranslator
  
+Python 3.8
+
 List of packages:
 * [OpenCV](https://github.com/skvark/opencv-python)
 * [Pillow](https://github.com/python-pillow/Pillow)
@@ -24,13 +26,47 @@ translator.processing()
 #For translate the image
 translator.translate()
 image_out=translator.img_out
+#img_out is OpenCV image
 #You can use method run_translator for translate string
 ```
+## Installation
+
+## Windows
+1. Install the package
+```
+pip3 git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
+```
+2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
+3. Extract the files into executable (ex: 7-Zip)
+4. Place the extracted files into the *tesseract-ocr* folder at the root of package
+
+## Linux
+1. Clone the repositoy
+```
+pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
+```
+2. Install tesseract `apt-get install tesseract-ocr`
+
+
 
 ## Development
 
+## Windows
+1. Clone the repositoy
 ```
-git clone --recurse-submodules https://github.com/A2va/ImageTranslator.git
+git clone https://github.com/A2va/ImageTranslator.git
 pip install -r requirements.txt
 pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 ```
+2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
+3. Extract the files into executable (ex: 7-Zip)
+4. Place the extracted files into the *tesseract-ocr* folder at the root of package
+
+## Linux
+1. Clone the repositoy
+```
+git clone https://github.com/A2va/ImageTranslator.git
+pip install -r requirements.txt
+pip install torch torchvision
+```
+2. Install tesseract `apt-get install tesseract-ocr`
