@@ -35,17 +35,23 @@ image_out=translator.img_out
 1. Install the package
 ```
 pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
+pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 ```
 2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
 3. Extract the files into executable (ex: 7-Zip)
 4. Place the extracted files into the *tesseract-ocr* folder at the root of package
+5. Download models from EasyOCR and Tesseract with this command `python image_translator.download_model` 
+This take several minutes
 
 ## Linux
-1. Clone the repositoy
+1. Install the package
 ```
 pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
+pip install torch torchvision
 ```
 2. Install tesseract `apt-get install tesseract-ocr`
+3. Download models from EasyOCR and Tesseract with this command `python image_translator.download_model` 
+This take several minutes
 
 ## Development
 
@@ -59,6 +65,8 @@ pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.
 2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
 3. Extract the files into executable (ex: 7-Zip)
 4. Place the extracted files into the *tesseract-ocr* folder at the root of package
+5. Download models from EasyOCR and Tesseract with this command `python download_model` 
+This take several minutes
 
 ## Linux
 1. Clone the repositoy
@@ -68,3 +76,5 @@ pip install -r requirements.txt
 pip install torch torchvision
 ```
 2. Install tesseract `apt-get install tesseract-ocr`
+3. Download models from EasyOCR and Tesseract with this command `python download_model` 
+This take several minutes
