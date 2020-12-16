@@ -23,6 +23,6 @@ def download_models():
 
     tesseract_path='tesseract-ocr/tessdata'
     if sys.platform.startswith('linux'):
-        tesseract_path = subprocess.check_output(['where','gcc'],shell=True).decode('utf-8')
+        tesseract_path = subprocess.check_output(['where','tesseract'],shell=True).decode('utf-8')
 
     download_and_unzip('https://github.com/tesseract-ocr/tessdata_best/archive/master.zip',None,tesseract_path,True)
