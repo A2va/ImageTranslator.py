@@ -16,6 +16,13 @@
 #URL: https://github.com/tesseract-ocr/tessdata_best/archive/master.zip
 
 from image_translator.model.download import download_and_unzip
+import sys
+import subprocess
 
-def download_model():
-    download_and_unzip('https://github.com/tesseract-ocr/tessdata_best/archive/master.zip',None,'tesseract-ocr/tessdata',True)
+def download_models():
+
+    tesseract_path='tesseract-ocr/tessdata'
+    if sys.platform.startswith('linux'):
+        tesseract_path = subprocess.check_output(['where','gcc'],shell=True).decode('utf-8')
+
+    download_and_unzip('https://github.com/tesseract-ocr/tessdata_best/archive/master.zip',None,tesseract_path,True)
