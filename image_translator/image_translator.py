@@ -298,11 +298,10 @@ class ImageTranslator():
         if img.shape[2] == 4:
             img = img[:, :, :3]
 
-        refine_net = craft_detector.load_refinenet_model(cuda=False)
         craft_net = craft_detector.load_craftnet_model(cuda=False)
         prediction_result = craft_detector.get_prediction(
             image=img,
-            craft_net=craft_net, refine_net=refine_net, text_threshold=0.7,
+            craft_net=craft_net, refine_net=None, text_threshold=0.7,
             link_threshold=0.4, low_text=0.4, cuda=False, long_size=1280)
 
         return prediction_result
