@@ -5,6 +5,7 @@
 
 #Tesseract 
 /tesseract-ocr
+/easyocr
 #Icons
 /icons
 # Byte-compiled / optimized / DLL files
