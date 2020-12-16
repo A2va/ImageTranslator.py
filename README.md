@@ -47,8 +47,6 @@ pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
 ```
 2. Install tesseract `apt-get install tesseract-ocr`
 
-
-
 ## Development
 
 ## Windows
