@@ -23,45 +23,9 @@ def download_models():
 
     print('Detector model:')
     download_and_unzip(model_url['detector'][0],DETECTOR_FILENAME,'easyocr/model')
-
+    
     print('EasyOCR models:')
-    print('     Latin:')
-    download_and_unzip(model_url['latin.pth'][0],'latin.pth','easyocr/model')
-
-    print('     Chinese:')
-    download_and_unzip(model_url['chinese.pth'][0],'chinese.pth','easyocr/model')
-
-    print('     Chinese (simplified):')
-    download_and_unzip(model_url['chinese_sim.pth'][0],'chinese_sim.pth','easyocr/model')
-
-    print('     Japanese:')
-    download_and_unzip(model_url['japanese.pth'][0],'japanese.pth','easyocr/model')
-
-    print('     Korean:')
-    download_and_unzip(model_url['korean.pth'][0],'korean.pth','easyocr/model')
-
-    print('     Thai:')
-    download_and_unzip(model_url['thai.pth'][0],'thai.pth','easyocr/model')
-
-    print('     Devanagari:')
-    download_and_unzip(model_url['devanagari.pth'][0],'devanagari.pth','easyocr/model')
-
-    print('     Cyrillic:')
-    download_and_unzip(model_url['cyrillic.pth'][0],'cyrillic.pth','easyocr/model')
-
-    print('     Arabic:')
-    download_and_unzip(model_url['arabic.pth'][0],'arabic.pth','easyocr/model')
-
-    print('     Tamil:')
-    download_and_unzip(model_url['tamil.pth'][0],'tamil.pth','easyocr/model')
-
-    print('     Bengali:')
-    download_and_unzip(model_url['bengali.pth'][0],'bengali.pth','easyocr/model')
-
-    print('     Telugu:')
-    download_and_unzip(model_url['telugu.pth'][0],'telugu.pth','easyocr/model')
-
-    print('     Kannada:')
-    download_and_unzip(model_url['kannada.pth'][0],'kannada.pth','easyocr/model')
-  
-
+    for name in model_url:
+        if os.path.exists(f'easyocr/model/{name}') and name!='detector':
+            download_and_unzip(model_url[name][0],name,'easyocr/model')
+    
