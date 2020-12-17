@@ -38,10 +38,10 @@ if __name__ == "__main__":
             elif value=='easyocr':
                 easyocr.download_models()
             elif value=='all':
-                print('Downlaod all models')
-            else:
-                print("Error: Wrong argument value")
+                print('Download all models')
                 easyocr.download_models()
                 tesseract.download_models()
+            else:
+                print("Error: Wrong argument value")
         else:
             print ("Error: Wrong argument")
