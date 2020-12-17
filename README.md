@@ -31,7 +31,7 @@ image_out=translator.img_out
 ```
 ## Installation
 
-## Windows
+### Windows
 1. Install the package
 ```
 pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
@@ -43,7 +43,7 @@ pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.
 5. Download models from EasyOCR and Tesseract with this command `python image_translator.download_model` 
 This take several minutes
 
-## Linux
+### Linux
 1. Install the package
 ```
 pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
@@ -55,7 +55,7 @@ This take several minutes
 
 ## Development
 
-## Windows
+### Windows
 1. Clone the repositoy
 ```
 git clone https://github.com/A2va/ImageTranslator.git
@@ -68,7 +68,7 @@ pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.
 5. Download models from EasyOCR and Tesseract with this command `python download_model` 
 This take several minutes
 
-## Linux
+### Linux
 1. Clone the repositoy
 ```
 git clone https://github.com/A2va/ImageTranslator.git
