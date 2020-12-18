@@ -31,6 +31,3 @@ def download_models():
         if not os.path.exists(f'easyocr/model/{name}') and name!='detector':
             download_and_unzip(model_url[name][0],name,'easyocr/model')
 
-if __name__ == "__main__":
-    download_models()
-    

@@ -17,33 +17,19 @@ import os
 from zipfile import ZipFile
 from urllib.request import urlretrieve
 
-# Picked the printProgressBar and download_and_unzip function
-# from EasyOCR
+from tqdm import tqdm
 
-def printProgressBar(prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
-    """
-    Call in a loop to create terminal progress bar
-    @params:
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-    """
-    def progress_hook(count, blockSize, totalSize):
-        progress = count * blockSize / totalSize
-        percent = ("{0:." + str(decimals) + "f}").format(progress * 100)
-        filledLength = int(length * progress)
-        bar = fill * filledLength + '-' * (length - filledLength)
-        print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
 
-    return progress_hook
-
+class DownloadProgressBar(tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        self.update(b * bsize - self.n)
 
 def download_and_unzip(url, filename, model_storage_directory,extract_all=False):
     zip_path = os.path.join(model_storage_directory, 'temp.zip')
-    urlretrieve(url, zip_path,reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
+    progress_bar=DownloadProgressBar(unit='B', unit_scale=True,miniters=1, desc='')
+    urlretrieve(url, zip_path,reporthook=progress_bar.update_to)
     with ZipFile(zip_path, 'r') as zipObj:
         if extract_all:
             zipObj.extractall(model_storage_directory)
