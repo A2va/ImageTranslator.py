@@ -34,8 +34,7 @@ if __name__ == "__main__":
     for arg, value in arguments:
         if arg in ("-m", "--mode"):
             if value=='tesseract':
-                print('t')
-                #tesseract.download_models()
+                tesseract.download_models()
             elif value=='easyocr':
                 easyocr.download_models()
             elif value=='all':

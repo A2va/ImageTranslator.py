@@ -42,7 +42,7 @@ pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.
 4. Place the extracted files into the *tesseract-ocr* folder at the root of package
 5. Download models from EasyOCR and Tesseract with this command `python -m image_translator.download_model -m all`.
 The m flag accept three value (all,tesseract,easyocr). The downloading time can be long.
-
+*Note: Sometimes the progress bar stop so put a character on terminal*
 
 ### Linux
 1. Install the package
@@ -50,9 +50,10 @@ The m flag accept three value (all,tesseract,easyocr). The downloading time can 
 pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
 pip install torch torchvision
 ```
-2. Install tesseract `apt-get install tesseract-ocr`
+2. Install tesseract (v4.1.0)
 3. Download models from EasyOCR and Tesseract with this command `python -m image_translator.download_model -m all`.
 The m flag accept three value (all,tesseract,easyocr). The downloading time can be long.
+*Note: Sometimes the progress bar stop so put a character on terminal*
 
 ## Development
 
@@ -68,6 +69,7 @@ pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.
 4. Place the extracted files into the *tesseract-ocr* folder at the root of package
 5. Download models from EasyOCR and Tesseract with this command `python download_model -m all`.
 The m flag accept three value (all,tesseract,easyocr). The downloading time can be long.
+*Note: Sometimes the progress bar stop so put a character on terminal*
 
 ### Linux
 1. Clone the repositoy
@@ -76,6 +78,7 @@ git clone https://github.com/A2va/ImageTranslator.git
 pip install -r requirements.txt
 pip install torch torchvision
 ```
-2. Install tesseract `apt-get install tesseract-ocr`
+2. Install tesseract (v4.1.0)
 3. Download models from EasyOCR and Tesseract with this command `python download_model -m all`.
 The m flag accept three value (all,tesseract,easyocr). The downloading time can be long.
+*Note: Sometimes the progress bar stop so put a character on terminal*

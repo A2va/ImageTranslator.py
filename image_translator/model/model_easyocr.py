@@ -40,11 +40,12 @@ def download_models():
     if not os.path.exists('./easyocr'):
         os.makedirs('easyocr/model')
 
-    print('Detector model:')
-    download_and_unzip(model_url['detector'][0],DETECTOR_FILENAME,'easyocr/model')
+    if not os.path.exists(f'./easyocr/model/{DETECTOR_FILENAME}'):
+        print('Detector model:\n')
+        download_and_unzip(model_url['detector'][0],DETECTOR_FILENAME,'easyocr/model')
     
-    print('EasyOCR models:')
+    print('EasyOCR models:\n')
     for name in model_url:
-        if os.path.exists(f'easyocr/model/{name}') and name!='detector':
+        if not os.path.exists(f'easyocr/model/{name}') and name!='detector':
             download_and_unzip(model_url[name][0],name,'easyocr/model')
     
