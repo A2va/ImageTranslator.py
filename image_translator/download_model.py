@@ -22,27 +22,27 @@ long_options = ["mode="]
 
 if __name__ == "__main__":
 
-    args = sys.argv
-    args = args[1:]
+    # args = sys.argv
+    # args = args[1:]
 
-    try:
-        arguments, values = getopt.getopt(args, short_options, long_options)
-    except getopt.error as err:
-        print (str(err))
-        sys.exit(2)
+    # try:
+    #     arguments, values = getopt.getopt(args, short_options, long_options)
+    # except getopt.error as err:
+    #     print (str(err))
+    #     sys.exit(2)
 
-    for arg, value in arguments:
-        if arg in ("-m", "--mode"):
-            if value=='tesseract':
-                print('t')
-                #tesseract.download_models()
-            elif value=='easyocr':
-                easyocr.download_models()
-            elif value=='all':
-                print('Download all models')
-                easyocr.download_models()
-                tesseract.download_models()
-            else:
-                print("Error: Wrong argument value")
-        else:
-            print ("Error: Wrong argument")
+    # for arg, value in arguments:
+    #     if arg in ("-m", "--mode"):
+    #         if value=='tesseract':
+    #             tesseract.download_models()
+    #         elif value=='easyocr':
+    #             easyocr.download_models()
+    #         elif value=='all':
+    #             print('Download all models')
+    #             easyocr.download_models()
+    #             tesseract.download_models()
+    #         else:
+    #             print("Error: Wrong argument value")
+    #     else:
+    #         print ("Error: Wrong argument") 
+    easyocr.download_models()

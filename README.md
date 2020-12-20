@@ -40,8 +40,9 @@ pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.
 2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
 3. Extract the files into executable (ex: 7-Zip)
 4. Place the extracted files into the *tesseract-ocr* folder at the root of package
-5. Download models from EasyOCR and Tesseract with this command `python -m image_translator.download_model -m all`.
-The m flag accept three value (all,tesseract,easyocr). The downloading time can be long.
+5. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
+6. Place the traineddata files into the tessdata folder.
+7. Download models from EasyOCR `python -m image_translator.download_model`.
 *Note: Sometimes the progress bar stop so put a character on terminal*
 
 ### Linux
@@ -51,8 +52,9 @@ pip git+git://github.com/A2va/ImageTranslator@master#egg=image_translator
 pip install torch torchvision
 ```
 2. Install tesseract (v4.1.0)
-3. Download models from EasyOCR and Tesseract with this command `python -m image_translator.download_model -m all`.
-The m flag accept three value (all,tesseract,easyocr). The downloading time can be long.
+3. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
+4. Place the traineddata files into the tessdata folder ('whereis tesseract').
+5. Download models from EasyOCR `python -m image_translator.download_model`.
 *Note: Sometimes the progress bar stop so put a character on terminal*
 
 ## Development
@@ -67,8 +69,9 @@ pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.
 2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
 3. Extract the files into executable (ex: 7-Zip)
 4. Place the extracted files into the *tesseract-ocr* folder at the root of package
-5. Download models from EasyOCR and Tesseract with this command `python download_model -m all`.
-The m flag accept three value (all,tesseract,easyocr). The downloading time can be long.
+5. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
+6. Place the traineddata files into the tessdata folder.
+7. Download models from EasyOCR `python -m image_translator.download_model`.
 *Note: Sometimes the progress bar stop so put a character on terminal*
 
 ### Linux
@@ -79,6 +82,7 @@ pip install -r requirements.txt
 pip install torch torchvision
 ```
 2. Install tesseract (v4.1.0)
-3. Download models from EasyOCR and Tesseract with this command `python download_model -m all`.
-The m flag accept three value (all,tesseract,easyocr). The downloading time can be long.
+3. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
+4. Place the traineddata files into the tessdata folder ('whereis tesseract').
+5. Download models from EasyOCR `python -m image_translator.download_model`.
 *Note: Sometimes the progress bar stop so put a character on terminal*
