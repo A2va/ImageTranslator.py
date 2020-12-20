@@ -24,7 +24,7 @@ import PIL.ImageDraw as PIL_ImgDraw
 
 # Text detector
 import craft_text_detector as craft_detector
-
+import craft_text_detector.torch_utils as torch_utils
 #OCR
 import easyocr
 import pytesseract
@@ -65,6 +65,40 @@ OCR = {
     'tesseract': 0,
     'easyocr': 1
 }
+
+def copyStateDict(state_dict):
+    if list(state_dict.keys())[0].startswith("module"):
+        start_idx = 1
+    else:
+        start_idx = 0
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        name = ".".join(k.split(".")[start_idx:])
+        new_state_dict[name] = v
+    return new_state_dict
+
+
+def load_craftnet_model(cuda: bool = False):
+
+    from craft_text_detector.models.craftnet import CraftNet
+
+    craft_net = CraftNet()  # initialize
+    weight_path='easyocr/model/craft_mlt_25k.pth'
+
+    # arange device
+    if cuda:
+        craft_net.load_state_dict(copyStateDict(torch_utils.load(weight_path)))
+
+        craft_net = craft_net.cuda()
+        craft_net = torch_utils.DataParallel(craft_net)
+        torch_utils.cudnn_benchmark = False
+    else:
+        craft_net.load_state_dict(
+            copyStateDict(torch_utils.load(weight_path, map_location="cpu"))
+        )
+    craft_net.eval()
+    return craft_net
+
 
 class UnknownLanguage(Exception):
     pass
@@ -261,7 +295,7 @@ class ImageTranslator():
         """
         Run EasyOCR
         """
-        reader = easyocr.Reader([lang_code])
+        reader = easyocr.Reader([lang_code],gpu=False,model_storage_directory='easyocr/model')
         result = reader.readtext(paragraph['image'])
         # 1|----------------------------|2
         #  |                            |
@@ -298,7 +332,7 @@ class ImageTranslator():
         if img.shape[2] == 4:
             img = img[:, :, :3]
 
-        craft_net = craft_detector.load_craftnet_model(cuda=False)
+        craft_net = load_craftnet_model(cuda=False)
         prediction_result = craft_detector.get_prediction(
             image=img,
             craft_net=craft_net, refine_net=None, text_threshold=0.7,
