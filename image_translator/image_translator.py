@@ -117,6 +117,7 @@ class ImageTranslator():
         """
         self.img = ImageTranslator.reformat_input(img)
         self.img_out = None
+        self.img_process = None
         self.text = []
         self.mask_paragraph = None
         self.ocr = ocr
@@ -153,6 +154,7 @@ class ImageTranslator():
     def translate(self):
         if self.img_out is None:
             self.processing()
+            self.img_out=self.img_process.copy()
         log.debug('Apply translation to image')
         for i in range(0, len(self.text)):
             if self.text[i]['string'] != '':
@@ -163,7 +165,7 @@ class ImageTranslator():
         return self.text
 
     def processing(self):
-        self.img_out=self.img.copy()
+        self.img_process=self.img.copy()
         self.mask_paragraph = self.__detect_text(self.img)
         paragraphs = self.__detect_paragraph()
         # Apply Binarization and ocr
@@ -178,7 +180,7 @@ class ImageTranslator():
             w = self.text[i]['paragraph_w']
             h = self.text[i]['paragraph_h']
             if self.text[i]['string'] != '':
-                cv2.rectangle(self.img_out, (x, y), (x+w, y+h), (255, 255, 255), -1)
+                cv2.rectangle(self.img_process, (x, y), (x+w, y+h), (255, 255, 255), -1)
                 self.text[i]['translated_string'] = self.run_translator(self.text[i]['string'])
                 
     def __detect_text(self, img):
