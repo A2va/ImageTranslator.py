@@ -155,7 +155,7 @@ class ImageTranslator():
     def translate(self):
         if self.img_out is None:
             self.processing()
-            self.img_out=self.img_process.copy()
+        self.img_out=self.img_process.copy()
         log.debug('Apply translation to image')
         for i in range(0, len(self.text)):
             if self.text[i]['string'] != '':
