@@ -153,7 +153,7 @@ class ImageTranslator():
             self.translator='google'
 
     def translate(self):
-        if self.img_out is None:
+        if self.img_process is None:
             self.processing()
         self.img_out=self.img_process.copy()
         log.debug('Apply translation to image')
