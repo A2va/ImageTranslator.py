@@ -25,6 +25,7 @@ import PIL.ImageDraw as PIL_ImgDraw
 # Text detector
 import craft_text_detector as craft_detector
 import craft_text_detector.torch_utils as torch_utils
+from collections import OrderedDict
 #OCR
 import easyocr
 import pytesseract
