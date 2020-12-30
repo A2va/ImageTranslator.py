@@ -5,6 +5,4 @@ pytesseract
 PyBinglate
 pyppeteer
 pyquery
-easyocr
-craft-text-detector
 tqdm
