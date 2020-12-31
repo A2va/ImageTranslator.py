@@ -225,7 +225,7 @@ OCR_LANG={
     'ita': ['ita','it'],                        #Italian
     #'ita_old': ['ita_old','invalid'],          #Italian (old)
     'jav': ['jav','invalid'],                   #Javanese
-    'jpn': ['jpn','jp'],                        #Japanese
+    'jpn': ['jpn','ja'],                        #Japanese
     'jpn_vert': ['jpn_vert','invalid'],         #Japanese (vertical)
     'kan': ['kan','invalid'],                   #Kannada
     'kat': ['kat','invalid'],                   #Georgian
