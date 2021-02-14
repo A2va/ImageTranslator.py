@@ -259,7 +259,7 @@ class ImageTranslator():
                 'y':y,
                 'w':w,
                 'h':h,
-                'paragraph_w':paragepah width,
+                'paragraph_w':paragraph width,
                 'paragraph_h':paragraph height,
                 'string':string,
                 'image': image,
