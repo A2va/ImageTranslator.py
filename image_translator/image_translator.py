@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import List, Set, Dict, Tuple, Optional, Union
+
 # Image
 import cv2
 import numpy as np
@@ -108,7 +110,7 @@ class ImageTranslator():
     """
     The image translator class
     """
-    def __init__(self, img, ocr, translator, src_lang, dest_lang):
+    def __init__(self, img: Union[PIL_Img.Image,np.array,str], ocr:str, translator:str, src_lang:str, dest_lang:str):
         """
         img: path file, bytes URL, Pillow/OpenCV image and data URI\n
         ocr: 'tesseract' or 'easyocr'\n
@@ -116,16 +118,18 @@ class ImageTranslator():
         src_lang: source language of image. See code in utils.lang\n
         dest_lang: destination language of image. See code in utils.lang\n
         """
-        self.img = ImageTranslator.reformat_input(img)
-        self.img_out = None
-        self.img_process = None
-        self.text = []
-        self.mask_paragraph = None
-        self.ocr = ocr
-        self.translator = translator
-        self.src_lang = src_lang
-        self.dest_lang = dest_lang
+        self.img: np.ndarray = ImageTranslator.reformat_input(img)
+        self.img_out: Optional(np.array) = None
+        self.img_process: Optional(np.array) = None
+        self.text: List = []
+        self.mask_paragraph: Optional(np.array) = None
+        self.ocr: str = ocr
+        self.translator: str = translator
+        self.src_lang: str = src_lang
+        self.dest_lang: str = dest_lang
 
+        self.trans_src_lang: str = ''
+        self.trans_dest_lang: str = ''
 
         #Test the language code for ocr and translator
         try:
@@ -136,7 +140,6 @@ class ImageTranslator():
         if self.ocr_lang == 'invalid':
             log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
                         f'Switch to tesseract')
-            lang_code = lang.OCR_LANG[self.src_lang][OCR['tesseract']]
             self.ocr='tesseract'
 
         try:
@@ -152,17 +155,17 @@ class ImageTranslator():
             self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
             self.translator='google'
 
-    def translate(self):
+    def translate(self)-> np.array:
         if self.img_process is None:
             self.processing()
-        self.img_out=self.img_process.copy()
+        self.img_out = self.img_process.copy()
         log.debug('Apply translation to image')
         for i in range(0, len(self.text)):
             if self.text[i]['string'] != '':
                 self.__apply_translation(self.text[i])
         return self.img_out
 
-    def get_text(self):
+    def get_text(self)-> List:
         return self.text
 
     def processing(self):
