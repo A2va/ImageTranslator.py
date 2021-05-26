@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import image_translator.model.model_easyocr as easyocr
+import image_translator.model.model_easyocr as model_easyocr
 import image_translator.model.model_tesseract as tesseract
 import getopt, sys
 
@@ -36,13 +36,12 @@ if __name__ == "__main__":
     #         if value=='tesseract':
     #             tesseract.download_models()
     #         elif value=='easyocr':
-    #             easyocr.download_models()
+    #             model_easyocr.download_models()
     #         elif value=='all':
     #             print('Download all models')
-    #             easyocr.download_models()
+    #             model_easyocr.download_models()
     #             tesseract.download_models()
     #         else:
     #             print("Error: Wrong argument value")
     #     else:
     #         print ("Error: Wrong argument") 
-    easyocr.download_models()

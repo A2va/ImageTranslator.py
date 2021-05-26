@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from easyocr.config import model_url, DETECTOR_FILENAME
+from easyocr.config import recognition_models, detection_models
 from image_translator.model.download import download_and_unzip
 import os
 
@@ -22,12 +22,14 @@ def download_models():
     if not os.path.exists('./easyocr'):
         os.makedirs('easyocr/model')
 
-    if not os.path.exists(f'./easyocr/model/{DETECTOR_FILENAME}'):
+    detector_filename = detection_models['craft']['filename']
+    if not os.path.exists(f'./easyocr/model/{detector_filename}'):
         print('Detector model:\n')
-        download_and_unzip(model_url['detector'][0],DETECTOR_FILENAME,'easyocr/model',DETECTOR_FILENAME)
+        download_and_unzip(detection_models['craft']['url'],detector_filename,'easyocr/model',detector_filename)
     
     print('EasyOCR models:\n')
-    for name in model_url:
-        if not os.path.exists(f'easyocr/model/{name}') and name!='detector':
-            download_and_unzip(model_url[name][0],name,'easyocr/model',name)
-
+    for model in recognition_models['gen2']:
+        url = recognition_models['gen2'][model]['url']
+        filename = recognition_models['gen2'][model]['filename']
+        if not os.path.exists(f'easyocr/model/{filename}'):
+            download_and_unzip(url,filename,'easyocr/model',filename)
