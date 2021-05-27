@@ -8,7 +8,7 @@
 
 # The above copyright notice and this permission notice shall be included in all copies or substantial
 # portions of the Software.
- 
+
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
 # LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 # IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
@@ -25,36 +25,37 @@ log = logging.getLogger('image_translator')
 
 MAXBLOCKSIZE = 3000
 
+
 class TextBin():
 
-    def __init__(self,img):
-        self.orig_img=img
-        self.img=img
-        self.img_y=len(img)
-        self.img_x=len(img[0])
+    def __init__(self, img):
+        self.orig_img = img
+        self.img = img
+        self.img_y: int = len(img)
+        self.img_x: int = len(img[0])
 
-        self.contours=None
+        self.contours = None
 
-    def ii(self,xx, yy):
+    def ii(self, xx, yy):
         if yy >= self.img_y or xx >= self.img_x:
             return 0
         pixel = self.img[yy][xx]
         return 0.30 * pixel[2] + 0.59 * pixel[1] + 0.11 * pixel[0]
 
-    def connected(self,contour):
+    def connected(self, contour):
         first = contour[0][0]
         last = contour[len(contour) - 1][0]
         return abs(first[0] - last[0]) <= 1 and abs(first[1] - last[1]) <= 1
 
-    def c(self,index):
+    def c(self, index):
         return self.contours[index]
-      
-    def count_children(self,index, h_, contour):
+
+    def count_children(self, index, h_, contour):
         # No children
         if h_[index][2] < 0:
             return 0
         else:
-            #If the first child is a contour we care about
+            # If the first child is a contour we care about
             # then count it, otherwise don't
             if self.keep(self.c(h_[index][2])):
                 count = 1
@@ -64,17 +65,18 @@ class TextBin():
                 # Also count all of the child's siblings and their children
             count += self.count_siblings(h_[index][2], h_, contour, True)
             return count
-    def is_child(self,index, h_):
+
+    def is_child(self, index, h_):
         return self.get_parent(index, h_) > 0
 
-    def get_parent(self,index, h_):
+    def get_parent(self, index, h_):
         parent = h_[index][3]
         while not self.keep(self.c(parent)) and parent > 0:
             parent = h_[parent][3]
 
         return parent
 
-    def count_siblings(self,index, h_, contour, inc_children=False):
+    def count_siblings(self, index, h_, contour, inc_children=False):
         # Include the children if necessary
         if inc_children:
             count = self.count_children(index, h_, contour)
@@ -93,17 +95,17 @@ class TextBin():
         # Look behind
         n = h_[index][1]
         while n > 0:
-            if self.keep(c(n)):
+            if self.keep(self.c(n)):
                 count += 1
             if inc_children:
                 count += self.count_children(n, h_, contour)
             n = h_[n][1]
         return count
 
-    def keep(self,contour):
+    def keep(self, contour):
         return self.keep_box(contour) and self.connected(contour)
 
-    def keep_box(self,contour):
+    def keep_box(self, contour):
         xx, yy, w_, h_ = cv2.boundingRect(contour)
 
         # width and height need to be floats
@@ -114,14 +116,14 @@ class TextBin():
         # probably not a real character
         if w_ / h_ < 0.1 or w_ / h_ > 10:
             return False
-        
+
         # check size of the box
         if ((w_ * h_) > (MAXBLOCKSIZE)) or ((w_ * h_) < 15):
             return False
 
         return True
 
-    def include_box(self,index, h_, contour):
+    def include_box(self, index, h_, contour):
 
         if self.is_child(index, h_) and self.count_children(self.get_parent(index, h_), h_, contour) <= 4:
             return False
@@ -131,10 +133,9 @@ class TextBin():
 
         return True
 
-
     def run(self):
         log.debug('Start text binarization')
-        
+
         blue, green, red = cv2.split(self.img)
 
         # Run canny edge detection on each channel
@@ -146,7 +147,8 @@ class TextBin():
         edges = blue_edges | green_edges | red_edges
 
         # Find the contours
-        self.contours, hierarchy = cv2.findContours(edges.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        self.contours, hierarchy = cv2.findContours(
+            edges.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
         hierarchy = hierarchy[0]
 
@@ -156,7 +158,7 @@ class TextBin():
         # For each contour, find the bounding rectangle and decide
         # if it's one we care about
         for index_, contour_ in enumerate(self.contours):
-    
+
             x, y, w, h = cv2.boundingRect(contour_)
 
             # Check the contour and it's bounding box
@@ -166,7 +168,6 @@ class TextBin():
         # Make a white copy of our image
         new_image = edges.copy()
         new_image.fill(255)
-        boxes = []
 
         # For each box, find the foreground and background intensities
         for index_, (contour_, box) in enumerate(keepers):
