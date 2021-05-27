@@ -6,3 +6,4 @@ PyBinglate
 pyppeteer
 pyquery
 tqdm
+selenium
