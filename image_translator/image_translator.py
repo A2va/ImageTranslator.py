@@ -79,6 +79,7 @@ class Paragraph(TypedDict):
     string: str
     image: np.ndarray
     max_width: int
+    translated_string: str
 
 
 def copyStateDict(state_dict):
@@ -187,7 +188,7 @@ class ImageTranslator():
     def processing(self):
         self.img_process = self.img.copy()
         self.mask_paragraph = self.__detect_text(self.img)
-        paragraphs = self.__detect_paragraph()
+        paragraphs: List[Paragraph] = self.__detect_paragraph()
         # Apply Binarization and ocr
         for paragraph in paragraphs:
             binary = TextBin(paragraph['image'])
@@ -195,10 +196,10 @@ class ImageTranslator():
 
             self.text.append(self.__run_ocr(paragraph))
         for i in range(0, len(self.text)):
-            x = self.text[i]['x']
-            y = self.text[i]['y']
-            w = self.text[i]['paragraph_w']
-            h = self.text[i]['paragraph_h']
+            x: int = self.text[i]['x']
+            y: int = self.text[i]['y']
+            w: int = self.text[i]['paragraph_w']
+            h: int = self.text[i]['paragraph_h']
             if self.text[i]['string'] != '':
                 cv2.rectangle(self.img_process, (x, y),
                               (x+w, y+h), (255, 255, 255), -1)
@@ -210,7 +211,7 @@ class ImageTranslator():
         Return a mask from the text location
         """
         log.debug('Run CRAFT text detector and create mask')
-        blank_image = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
+        blank_image: np.ndarray = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
         prediction_result = self.__craft(img)
         boxes = prediction_result['boxes']
 
@@ -232,8 +233,8 @@ class ImageTranslator():
         }
         """
         log.debug('Crop each paragraph')
-        paragraph = []
-        img = self.img.copy()
+        paragraph: List = []
+        img: np.ndarray = self.img.copy()
 
         # Find contours
         kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
@@ -245,7 +246,7 @@ class ImageTranslator():
         for contour in contours:
 
             [x, y, w, h] = cv2.boundingRect(contour)
-            cropped = img[y:y + h, x:x + w]
+            cropped: np.ndarray = img[y:y + h, x:x + w]
 
             cropped = cv2.bitwise_and(
                 cropped,
@@ -290,7 +291,7 @@ class ImageTranslator():
         boxes = pytesseract.image_to_data(paragraph['image'], lang=lang_code)
         string = ''
         x, y, w, h = (0, 0, 0, 0)
-        first = True
+        first: bool = True
         for a, b in enumerate(boxes.splitlines()):
             if a != 0:
                 b = b.split()
@@ -322,16 +323,16 @@ class ImageTranslator():
         """
         reader = easyocr.Reader([lang_code], gpu=False,
                                 model_storage_directory='easyocr/model')
-        result = reader.readtext(paragraph['image'])
+        result: List = reader.readtext(paragraph['image'])
         # 1|----------------------------|2
         #  |                            |
         # 4|----------------------------|3
         # [[[x1,y1],[x2,y2][x3,y3],[x4,y4],text],confidence]
-        x = result[0][0][0][0]
-        y = result[0][0][0][1]
-        w = result[0][0][2][0] - x
-        h = result[0][0][2][1] - y
-        string = ''
+        x: int = result[0][0][0][0]
+        y: int = result[0][0][0][1]
+        w: int = result[0][0][2][0] - x
+        h: int = result[0][0][2][1] - y
+        string: str = ''
         for res in result:
             string += res[1]
         return {
@@ -368,7 +369,7 @@ class ImageTranslator():
         return prediction_result
 
     @staticmethod
-    def reformat_input(image) -> np.ndarray:
+    def reformat_input(image: Union[PIL_Img.Image, np.ndarray, str]) -> np.ndarray:
         """
         Reformat the input image
         """
@@ -396,7 +397,7 @@ class ImageTranslator():
                       'string(file path or url), bytes, numpy array')
         return img
 
-    def __text_wrap(self, text, font: PIL_ImgFont.FreeTypeFont, max_width: int) -> List:
+    def __text_wrap(self, text: str, font: PIL_ImgFont.FreeTypeFont, max_width: int) -> List:
         """
         Wrap the into multiple lines
         """
@@ -423,7 +424,7 @@ class ImageTranslator():
                 lines.append(line)
         return lines
 
-    def run_translator(self, text):
+    def run_translator(self, text: str):
         """
         Run translator between Google, Bing and DeepL
         """
@@ -438,7 +439,7 @@ class ImageTranslator():
             return self.__run_deepl(text, self.trans_dest_lang,
                                     self.trans_src_lang)
 
-    def __run_google(self, text, dest_lang: str, src_lang: str):
+    def __run_google(self, text: str, dest_lang: str, src_lang: str):
         """
         Run google translator
         """
@@ -448,7 +449,7 @@ class ImageTranslator():
 
         return string
 
-    def __run_bing(self, text, dest_lang: str, src_lang: str):
+    def __run_bing(self, text: str, dest_lang: str, src_lang: str):
         """
         Run bing translator
         """
@@ -457,7 +458,7 @@ class ImageTranslator():
 
         return string
 
-    def __run_deepl(self, text, dest_lang: str, src_lang: str):
+    def __run_deepl(self, text: str, dest_lang: str, src_lang: str):
         """
         Run deepl translator
         """
@@ -466,7 +467,7 @@ class ImageTranslator():
 
         return string
 
-    def __apply_translation(self, text):
+    def __apply_translation(self, text: Paragraph):
         """
         Apply the translation on img_out
         """
