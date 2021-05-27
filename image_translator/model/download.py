@@ -26,10 +26,12 @@ class DownloadProgressBar(tqdm):
             self.total = tsize
         self.update(b * bsize - self.n)
 
-def download_and_unzip(url, filename, model_storage_directory,desc,extract_all=False):
+
+def download_and_unzip(url, filename, model_storage_directory, desc, extract_all=False):
     zip_path = os.path.join(model_storage_directory, 'temp.zip')
-    progress_bar=DownloadProgressBar(unit='B', unit_scale=True,miniters=1, desc=desc)
-    urlretrieve(url, zip_path,reporthook=progress_bar.update_to)
+    progress_bar = DownloadProgressBar(
+        unit='B', unit_scale=True, miniters=1, desc=desc)
+    urlretrieve(url, zip_path, reporthook=progress_bar.update_to)
     with ZipFile(zip_path, 'r') as zipObj:
         if extract_all:
             zipObj.extractall(model_storage_directory)

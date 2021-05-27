@@ -21,7 +21,7 @@
 # SOFTWARE
 # https://github.com/ffreemt/deepl-tr-async
 
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 # import os
 
@@ -33,7 +33,7 @@ from pyppeteer import launch
 from pyquery import PyQuery as pq
 
 
-#Logging
+# Logging
 import logging
 log = logging.getLogger('image_translator')
 
@@ -80,9 +80,9 @@ class DeepL:
     async def deepl_tr_async(
             self,
             text: str,
-            from_lang: str="auto",
-            to_lang: str="auto",
-            waitfor: Optional[float]=None,
+            from_lang: str = "auto",
+            to_lang: str = "auto",
+            waitfor: Optional[float] = None,
     ) -> Optional[str]:
         """ deepl via pyppeteer
         from_lang = 'de'
@@ -208,7 +208,6 @@ class DeepL:
         if loop.is_closed():
             loop = asyncio.new_event_loop()
 
-        sents = self.text
         self.browser = LOOP.run_until_complete(self.get_ppbrowser())
         try:
             res = loop.run_until_complete(

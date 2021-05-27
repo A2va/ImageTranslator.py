@@ -17,6 +17,7 @@ from easyocr.config import recognition_models, detection_models
 from image_translator.model.download import download_and_unzip
 import os
 
+
 def download_models():
 
     if not os.path.exists('./easyocr'):
@@ -25,11 +26,12 @@ def download_models():
     detector_filename = detection_models['craft']['filename']
     if not os.path.exists(f'./easyocr/model/{detector_filename}'):
         print('Detector model:\n')
-        download_and_unzip(detection_models['craft']['url'],detector_filename,'easyocr/model',detector_filename)
-    
+        download_and_unzip(
+            detection_models['craft']['url'], detector_filename, 'easyocr/model', detector_filename)
+
     print('EasyOCR models:\n')
     for model in recognition_models['gen2']:
         url = recognition_models['gen2'][model]['url']
         filename = recognition_models['gen2'][model]['filename']
         if not os.path.exists(f'easyocr/model/{filename}'):
-            download_and_unzip(url,filename,'easyocr/model',filename)
+            download_and_unzip(url, filename, 'easyocr/model', filename)
