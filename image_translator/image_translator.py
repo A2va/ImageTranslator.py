@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from os import read
 from typing import List, Optional, Union, TypedDict
 
 # Image
@@ -212,12 +213,16 @@ class ImageTranslator():
         """
         log.debug('Run CRAFT text detector and create mask')
         blank_image: np.ndarray = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
-        prediction_result = self.__craft(img)
-        boxes = prediction_result['boxes']
+
+        # prediction_result = self.__craft(img)
+        # boxes = prediction_result['boxes']
+
+        reader = easyocr.Reader(['en']) # Set lang placeholder
+        boxes = reader.detect(img)[0]
 
         for box in boxes:
-            point1 = tuple(box[0])
-            point2 = tuple(box[2])
+            point1 = (int(box[0]), int(box[2]))
+            point2 = (int(box[0][1]), int(box[0][3]))
             cv2.rectangle(blank_image, point1, point2, (255, 255, 255), -1)
 
         return blank_image
