@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import List, Set, Dict, Tuple, Optional, Union
+from typing import List, Optional, Union, TypedDict
 
 # Image
 import cv2
@@ -69,6 +69,18 @@ OCR = {
 }
 
 
+class Paragraph(TypedDict):
+    x: int
+    y: int
+    w: int
+    h: int
+    paragraph_w: int
+    paragraph_h: int
+    string: str
+    image: np.ndarray
+    max_width: int
+
+
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
         start_idx = 1
@@ -112,8 +124,8 @@ class ImageTranslator():
     The image translator class
     """
 
-    def __init__(self, img: Union[PIL_Img.Image, np.ndarray, str], ocr: str, 
-                translator: str, src_lang: str, dest_lang: str):
+    def __init__(self, img: Union[PIL_Img.Image, np.ndarray, str], ocr: str,
+                 translator: str, src_lang: str, dest_lang: str):
         """
         img: path file, bytes URL, Pillow/OpenCV image and data URI\n
         ocr: 'tesseract' or 'easyocr'\n
@@ -124,7 +136,7 @@ class ImageTranslator():
         self.img: np.ndarray = ImageTranslator.reformat_input(img)
         self.img_out: Optional[np.ndarray] = None
         self.img_process: Optional[np.ndarray] = None
-        self.text: List = []
+        self.text: List[Paragraph] = []
         self.mask_paragraph: Optional[np.ndarray] = None
         self.ocr: str = ocr
         self.translator: str = translator
@@ -209,7 +221,7 @@ class ImageTranslator():
 
         return blank_image
 
-    def __detect_paragraph(self) -> List:
+    def __detect_paragraph(self) -> List[Paragraph]:
         """
         Return a dict {
              'image':cropped,
@@ -249,7 +261,7 @@ class ImageTranslator():
             })
         return paragraph
 
-    def __run_ocr(self, paragraph):
+    def __run_ocr(self, paragraph: Paragraph) -> Paragraph:
         """
         Run the selected OCR
         """
@@ -260,7 +272,7 @@ class ImageTranslator():
         elif self.ocr == 'tesseract':
             return self.__run_tesserract(paragraph, self.ocr_lang)
 
-    def __run_tesserract(self, paragraph, lang_code: str):
+    def __run_tesserract(self, paragraph: Paragraph, lang_code: str) -> Paragraph:
         """
             Return a dict
             {
@@ -304,7 +316,7 @@ class ImageTranslator():
             'font_size': int(h*1.1)
         }
 
-    def __run_easyocr(self, paragraph, lang_code: str):
+    def __run_easyocr(self, paragraph: Paragraph, lang_code: str) -> Paragraph:
         """
         Run EasyOCR
         """
@@ -384,7 +396,7 @@ class ImageTranslator():
                       'string(file path or url), bytes, numpy array')
         return img
 
-    def __text_wrap(self, text, font: PIL_ImgFont.FreeTypeFont, max_width: int):
+    def __text_wrap(self, text, font: PIL_ImgFont.FreeTypeFont, max_width: int) -> List:
         """
         Wrap the into multiple lines
         """
@@ -417,11 +429,14 @@ class ImageTranslator():
         """
 
         if self.translator == 'google':
-            return self.__run_google(text, self.trans_dest_lang, self.trans_src_lang)
+            return self.__run_google(text, self.trans_dest_lang,
+                                     self.trans_src_lang)
         elif self.translator == 'bing':
-            return self.__run_bing(text, self.trans_dest_lang, self.trans_src_lang)
+            return self.__run_bing(text, self.trans_dest_lang,
+                                   self.trans_src_lang)
         elif self.translator == 'deepl':
-            return self.__run_deepl(text, self.trans_dest_lang, self.trans_src_lang)
+            return self.__run_deepl(text, self.trans_dest_lang,
+                                    self.trans_src_lang)
 
     def __run_google(self, text, dest_lang: str, src_lang: str):
         """
