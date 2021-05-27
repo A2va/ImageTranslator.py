@@ -20,7 +20,6 @@ import cv2
 import numpy as np
 
 import PIL.Image as PIL_Img
-import PIL.ImageGrab as PIL_ImgGrab
 import PIL.ImageFont as PIL_ImgFont
 import PIL.ImageDraw as PIL_ImgDraw
 
@@ -28,7 +27,7 @@ import PIL.ImageDraw as PIL_ImgDraw
 import craft_text_detector as craft_detector
 import craft_text_detector.torch_utils as torch_utils
 from collections import OrderedDict
-#OCR
+# OCR
 import easyocr
 import pytesseract
 from image_translator.utils.text_binarization import TextBin
@@ -56,7 +55,7 @@ log.addHandler(fileHandler)
 
 log.setLevel(logging.WARNING)
 
-if sys.platform =='win32':
+if sys.platform == 'win32':
     pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
 
 TRANS = {
@@ -68,6 +67,7 @@ OCR = {
     'tesseract': 0,
     'easyocr': 1
 }
+
 
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -86,7 +86,7 @@ def load_craftnet_model(cuda: bool = False):
     from craft_text_detector.models.craftnet import CraftNet
 
     craft_net = CraftNet()  # initialize
-    weight_path='easyocr/model/craft_mlt_25k.pth'
+    weight_path = 'easyocr/model/craft_mlt_25k.pth'
 
     # arange device
     if cuda:
@@ -106,11 +106,14 @@ def load_craftnet_model(cuda: bool = False):
 class UnknownLanguage(Exception):
     pass
 
+
 class ImageTranslator():
     """
     The image translator class
     """
-    def __init__(self, img: Union[PIL_Img.Image,np.ndarray,str], ocr:str, translator:str, src_lang: str, dest_lang: str):
+
+    def __init__(self, img: Union[PIL_Img.Image, np.ndarray, str], ocr: str, 
+                translator: str, src_lang: str, dest_lang: str):
         """
         img: path file, bytes URL, Pillow/OpenCV image and data URI\n
         ocr: 'tesseract' or 'easyocr'\n
@@ -131,30 +134,32 @@ class ImageTranslator():
         self.trans_src_lang: str = ''
         self.trans_dest_lang: str = ''
 
-        #Test the language code for ocr and translator
+        # Test the language code for ocr and translator
         try:
             self.ocr_lang = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
-        except:
+        except UnknownLanguage:
             log.error(f'Language {self.ocr} is not available')
             raise UnknownLanguage(f'Language {self.ocr} is not available')
         if self.ocr_lang == 'invalid':
             log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
                         f'Switch to tesseract')
-            self.ocr='tesseract'
+            self.ocr = 'tesseract'
 
         try:
             self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
             self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
-        except:
+        except UnknownLanguage:
             log.error(f'Language {self.dest_lang} is not available')
-            raise UnknownLanguage(f'Language {self.dest_lang} is not available')
+            raise UnknownLanguage(
+                f'Language {self.dest_lang} is not available')
         if src_lang == 'invalid' or dest_lang == 'invalid':
             log.warning(f'The {self.translator} ocr has no {self.src_lang}'
                         f'or {self.dest_lang}.Switch to google')
             self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS['google']]
             self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
-            self.translator='google'
-    def translate(self)-> np.ndarray:
+            self.translator = 'google'
+
+    def translate(self) -> np.ndarray:
         if self.img_process is None:
             self.processing()
         self.img_out = self.img_process.copy()
@@ -164,11 +169,11 @@ class ImageTranslator():
                 self.__apply_translation(self.text[i])
         return self.img_out
 
-    def get_text(self)-> List:
+    def get_text(self) -> List:
         return self.text
 
     def processing(self):
-        self.img_process=self.img.copy()
+        self.img_process = self.img.copy()
         self.mask_paragraph = self.__detect_text(self.img)
         paragraphs = self.__detect_paragraph()
         # Apply Binarization and ocr
@@ -183,10 +188,12 @@ class ImageTranslator():
             w = self.text[i]['paragraph_w']
             h = self.text[i]['paragraph_h']
             if self.text[i]['string'] != '':
-                cv2.rectangle(self.img_process, (x, y), (x+w, y+h), (255, 255, 255), -1)
-                self.text[i]['translated_string'] = self.run_translator(self.text[i]['string'])
-                
-    def __detect_text(self, img: np.ndarray)-> np.ndarray:
+                cv2.rectangle(self.img_process, (x, y),
+                              (x+w, y+h), (255, 255, 255), -1)
+                self.text[i]['translated_string'] = self.run_translator(
+                    self.text[i]['string'])
+
+    def __detect_text(self, img: np.ndarray) -> np.ndarray:
         """
         Return a mask from the text location
         """
@@ -202,7 +209,7 @@ class ImageTranslator():
 
         return blank_image
 
-    def __detect_paragraph(self)-> List:
+    def __detect_paragraph(self) -> List:
         """
         Return a dict {
              'image':cropped,
@@ -246,7 +253,7 @@ class ImageTranslator():
         """
         Run the selected OCR
         """
-            
+
         log.debug(f'Run {self.ocr} ocr')
         if self.ocr == 'easyocr':
             return self.__run_easyocr(paragraph, self.ocr_lang)
@@ -284,23 +291,25 @@ class ImageTranslator():
                         first = False
                     string = string + str(b[11])+' '
         return {
-                'x': x + paragraph['x'] - 40,
-                'y': y + paragraph['y'] - 15,
-                'w': w,
-                'h': h,
-                'paragraph_w': paragraph['w'] + 20,
-                'paragraph_h': paragraph['h'] + 20,
-                'string': string,
-                'image': paragraph['image'],
-                'max_width': paragraph['w'],
-                'font_size': int(h*1.1)      #Only for Cantarell -> Find a solution for all fonts
-                }
+            'x': x + paragraph['x'] - 40,
+            'y': y + paragraph['y'] - 15,
+            'w': w,
+            'h': h,
+            'paragraph_w': paragraph['w'] + 20,
+            'paragraph_h': paragraph['h'] + 20,
+            'string': string,
+            'image': paragraph['image'],
+            'max_width': paragraph['w'],
+            # Only for Cantarell -> Find a solution for all fonts
+            'font_size': int(h*1.1)
+        }
 
-    def __run_easyocr(self, paragraph,lang_code: str):
+    def __run_easyocr(self, paragraph, lang_code: str):
         """
         Run EasyOCR
         """
-        reader = easyocr.Reader([lang_code],gpu=False,model_storage_directory='easyocr/model')
+        reader = easyocr.Reader([lang_code], gpu=False,
+                                model_storage_directory='easyocr/model')
         result = reader.readtext(paragraph['image'])
         # 1|----------------------------|2
         #  |                            |
@@ -314,17 +323,18 @@ class ImageTranslator():
         for res in result:
             string += res[1]
         return {
-                'x': x + paragraph['x'] - 40,
-                'y': y + paragraph['y'] - 15,
-                'w': w,
-                'h': h,
-                'paragraph_w': paragraph['w'] + 20,
-                'paragraph_h': paragraph['h'] + 20,
-                'string': string,
-                'image':  paragraph['image'],
-                'max_width': paragraph['w'],
-                'font_size': int(h*1.1)      #Only for Cantarell -> Find a solution for all fonts
-            }
+            'x': x + paragraph['x'] - 40,
+            'y': y + paragraph['y'] - 15,
+            'w': w,
+            'h': h,
+            'paragraph_w': paragraph['w'] + 20,
+            'paragraph_h': paragraph['h'] + 20,
+            'string': string,
+            'image':  paragraph['image'],
+            'max_width': paragraph['w'],
+            # Only for Cantarell -> Find a solution for all fonts
+            'font_size': int(h*1.1)
+        }
 
     def __craft(self, img: np.ndarray):
         """
@@ -346,7 +356,7 @@ class ImageTranslator():
         return prediction_result
 
     @staticmethod
-    def reformat_input(image)-> np.ndarray:
+    def reformat_input(image) -> np.ndarray:
         """
         Reformat the input image
         """
