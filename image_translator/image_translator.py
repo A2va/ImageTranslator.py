@@ -40,7 +40,7 @@ from image_translator.utils import lang
 
 import sys
 
-import urllib
+import urllib.request
 
 # Logging
 import logging
@@ -56,7 +56,7 @@ log.addHandler(fileHandler)
 
 log.setLevel(logging.WARNING)
 
-if sys.platform=='win32':
+if sys.platform =='win32':
     pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
 
 TRANS = {
@@ -110,7 +110,7 @@ class ImageTranslator():
     """
     The image translator class
     """
-    def __init__(self, img: Union[PIL_Img.Image,np.array,str], ocr:str, translator:str, src_lang:str, dest_lang:str):
+    def __init__(self, img: Union[PIL_Img.Image,np.ndarray,str], ocr:str, translator:str, src_lang: str, dest_lang: str):
         """
         img: path file, bytes URL, Pillow/OpenCV image and data URI\n
         ocr: 'tesseract' or 'easyocr'\n
@@ -119,10 +119,10 @@ class ImageTranslator():
         dest_lang: destination language of image. See code in utils.lang\n
         """
         self.img: np.ndarray = ImageTranslator.reformat_input(img)
-        self.img_out: Optional(np.array) = None
-        self.img_process: Optional(np.array) = None
+        self.img_out: Optional[np.ndarray] = None
+        self.img_process: Optional[np.ndarray] = None
         self.text: List = []
-        self.mask_paragraph: Optional(np.array) = None
+        self.mask_paragraph: Optional[np.ndarray] = None
         self.ocr: str = ocr
         self.translator: str = translator
         self.src_lang: str = src_lang
@@ -154,8 +154,7 @@ class ImageTranslator():
             self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS['google']]
             self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
             self.translator='google'
-
-    def translate(self)-> np.array:
+    def translate(self)-> np.ndarray:
         if self.img_process is None:
             self.processing()
         self.img_out = self.img_process.copy()
@@ -187,7 +186,7 @@ class ImageTranslator():
                 cv2.rectangle(self.img_process, (x, y), (x+w, y+h), (255, 255, 255), -1)
                 self.text[i]['translated_string'] = self.run_translator(self.text[i]['string'])
                 
-    def __detect_text(self, img):
+    def __detect_text(self, img: np.ndarray)-> np.ndarray:
         """
         Return a mask from the text location
         """
@@ -203,7 +202,7 @@ class ImageTranslator():
 
         return blank_image
 
-    def __detect_paragraph(self):
+    def __detect_paragraph(self)-> List:
         """
         Return a dict {
              'image':cropped,
@@ -241,7 +240,7 @@ class ImageTranslator():
                 'w': w,
                 'h': h
             })
-            return paragraph
+        return paragraph
 
     def __run_ocr(self, paragraph):
         """
@@ -254,7 +253,7 @@ class ImageTranslator():
         elif self.ocr == 'tesseract':
             return self.__run_tesserract(paragraph, self.ocr_lang)
 
-    def __run_tesserract(self, paragraph, lang_code):
+    def __run_tesserract(self, paragraph, lang_code: str):
         """
             Return a dict
             {
@@ -297,7 +296,7 @@ class ImageTranslator():
                 'font_size': int(h*1.1)      #Only for Cantarell -> Find a solution for all fonts
                 }
 
-    def __run_easyocr(self, paragraph,lang_code):
+    def __run_easyocr(self, paragraph,lang_code: str):
         """
         Run EasyOCR
         """
@@ -327,7 +326,7 @@ class ImageTranslator():
                 'font_size': int(h*1.1)      #Only for Cantarell -> Find a solution for all fonts
             }
 
-    def __craft(self, img):
+    def __craft(self, img: np.ndarray):
         """
         Return a predication of text location
         """
@@ -347,11 +346,10 @@ class ImageTranslator():
         return prediction_result
 
     @staticmethod
-    def reformat_input(image):
+    def reformat_input(image)-> np.ndarray:
         """
         Reformat the input image
         """
-        img=None
         if type(image) == str:
             # URL
             if image.startswith('http://') or image.startswith('https://'):
@@ -376,7 +374,7 @@ class ImageTranslator():
                       'string(file path or url), bytes, numpy array')
         return img
 
-    def __text_wrap(self, text, font, max_width):
+    def __text_wrap(self, text, font: PIL_ImgFont.FreeTypeFont, max_width: int):
         """
         Wrap the into multiple lines
         """
@@ -415,7 +413,7 @@ class ImageTranslator():
         elif self.translator == 'deepl':
             return self.__run_deepl(text, self.trans_dest_lang, self.trans_src_lang)
 
-    def __run_google(self, text, dest_lang, src_lang):
+    def __run_google(self, text, dest_lang: str, src_lang: str):
         """
         Run google translator
         """
@@ -425,7 +423,7 @@ class ImageTranslator():
 
         return string
 
-    def __run_bing(self, text, dest_lang, src_lang):
+    def __run_bing(self, text, dest_lang: str, src_lang: str):
         """
         Run bing translator
         """
@@ -434,7 +432,7 @@ class ImageTranslator():
 
         return string
 
-    def __run_deepl(self, text, dest_lang, src_lang):
+    def __run_deepl(self, text, dest_lang: str, src_lang: str):
         """
         Run deepl translator
         """
