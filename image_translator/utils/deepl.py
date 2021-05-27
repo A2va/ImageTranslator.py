@@ -21,9 +21,7 @@
 # SOFTWARE.
 # https://github.com/eggplants/deepl-cli
 
-import sys
 import time
-from textwrap import dedent
 from urllib.request import urlopen
 
 from selenium import webdriver
@@ -33,15 +31,17 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
 
-#Logging
+# Logging
 import logging
 log = logging.getLogger('image_translator')
 
 
 URL = r"https://www.deepl.com/translator"
 
+
 class DeepLArgCheckingError(Exception):
     pass
+
 
 class DeepLPageLoadError(Exception):
     pass
@@ -57,7 +57,7 @@ class DeepL:
         """Check an internet connection."""
 
         try:
-            response = urlopen('https://www.google.com/', timeout=10)
+            urlopen('https://www.google.com/', timeout=10)
             return True
         except:
             return False
@@ -65,11 +65,10 @@ class DeepL:
     def validate(self):
         """Check cmdarg and stdin."""
 
-
         if self.src_lang == self.dest_lang:
             # raise err if <fr:lang> == <to:lang>
-            log.error(f'Two languages cannot be same.')
-            raise DeepLArgCheckingError(f'Two languages cannot be same.')
+            log.error('Two languages cannot be same.')
+            raise DeepLArgCheckingError('Two languages cannot be same.')
 
         if len(self.text) > 5000:
             # raise err if stdin > 5000 chr
@@ -85,8 +84,8 @@ class DeepL:
         """Open a deepl page and throw a request."""
 
         if not self.internet_on():
-            log.error(f'Your network seem to be offline.')
-            raise DeepLPageLoadError(f'Your network seem to be offline.')
+            log.error('Your network seem to be offline.')
+            raise DeepLPageLoadError('Your network seem to be offline.')
 
         self.validate()
 
@@ -114,7 +113,7 @@ class DeepL:
                 EC.presence_of_all_elements_located
             )
         except TimeoutException as te:
-            log.error(f'Timeout exception')
+            log.error('Timeout exception')
             raise DeepLPageLoadError(te)
 
         input_area = d.find_element_by_xpath(
@@ -133,5 +132,6 @@ class DeepL:
         d.quit()
         return res
 
-tra =DeepL('This is a test','en','fr')
+
+tra = DeepL('This is a test', 'en', 'fr')
 print(tra.translate()) 
