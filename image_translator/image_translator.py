@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from os import read
 from typing import List, Optional, Union, TypedDict
 
 # Image
@@ -24,10 +23,7 @@ import PIL.Image as PIL_Img
 import PIL.ImageFont as PIL_ImgFont
 import PIL.ImageDraw as PIL_ImgDraw
 
-# Text detector
-import craft_text_detector as craft_detector
-import craft_text_detector.torch_utils as torch_utils
-from collections import OrderedDict
+
 # OCR
 import easyocr
 import pytesseract
@@ -81,40 +77,6 @@ class Paragraph(TypedDict):
     image: np.ndarray
     max_width: int
     translated_string: str
-
-
-def copyStateDict(state_dict):
-    if list(state_dict.keys())[0].startswith("module"):
-        start_idx = 1
-    else:
-        start_idx = 0
-    new_state_dict = OrderedDict()
-    for k, v in state_dict.items():
-        name = ".".join(k.split(".")[start_idx:])
-        new_state_dict[name] = v
-    return new_state_dict
-
-
-def load_craftnet_model(cuda: bool = False):
-
-    from craft_text_detector.models.craftnet import CraftNet
-
-    craft_net = CraftNet()  # initialize
-    weight_path = 'easyocr/model/craft_mlt_25k.pth'
-
-    # arange device
-    if cuda:
-        craft_net.load_state_dict(copyStateDict(torch_utils.load(weight_path)))
-
-        craft_net = craft_net.cuda()
-        craft_net = torch_utils.DataParallel(craft_net)
-        torch_utils.cudnn_benchmark = False
-    else:
-        craft_net.load_state_dict(
-            copyStateDict(torch_utils.load(weight_path, map_location="cpu"))
-        )
-    craft_net.eval()
-    return craft_net
 
 
 class UnknownLanguage(Exception):
@@ -214,15 +176,12 @@ class ImageTranslator():
         log.debug('Run CRAFT text detector and create mask')
         blank_image: np.ndarray = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
 
-        # prediction_result = self.__craft(img)
-        # boxes = prediction_result['boxes']
-
-        reader = easyocr.Reader(['en']) # Set lang placeholder
+        reader = easyocr.Reader(['en'])  # Set lang placeholder
         boxes = reader.detect(img)[0]
 
         for box in boxes:
             point1 = (int(box[0]), int(box[2]))
-            point2 = (int(box[0][1]), int(box[0][3]))
+            point2 = (int(box[1]), int(box[3]))
             cv2.rectangle(blank_image, point1, point2, (255, 255, 255), -1)
 
         return blank_image
@@ -353,25 +312,6 @@ class ImageTranslator():
             # Only for Cantarell -> Find a solution for all fonts
             'font_size': int(h*1.1)
         }
-
-    def __craft(self, img: np.ndarray):
-        """
-        Return a predication of text location
-        """
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-        if img.shape[0] == 2:
-            img = img[0]
-        if img.shape[2] == 4:
-            img = img[:, :, :3]
-
-        craft_net = load_craftnet_model(cuda=False)
-        prediction_result = craft_detector.get_prediction(
-            image=img,
-            craft_net=craft_net, refine_net=None, text_threshold=0.7,
-            link_threshold=0.4, low_text=0.4, cuda=False, long_size=1280)
-
-        return prediction_result
 
     @staticmethod
     def reformat_input(image: Union[PIL_Img.Image, np.ndarray, str]) -> np.ndarray:
