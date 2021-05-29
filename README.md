@@ -30,7 +30,6 @@ image_out=translator.img_out
 ```
 python -m pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 python -m pip install easyocr
-python -m pip install craft-text-detector
 python -m pip git+git://github.com/A2va/ImageTranslator@master#egg=ImageTranslator
 ```
 2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
@@ -45,7 +44,6 @@ python -m pip git+git://github.com/A2va/ImageTranslator@master#egg=ImageTranslat
 1. Install the package
 ```
 python -m pip install easyocr
-python -m pip install craft-text-detector
 python -m pip git+git://github.com/A2va/ImageTranslator@master#egg=ImageTranslator
 ```
 2. Install tesseract (v4.1.0)
@@ -62,7 +60,6 @@ python -m pip git+git://github.com/A2va/ImageTranslator@master#egg=ImageTranslat
 git clone https://github.com/A2va/ImageTranslator.git
 python -m pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 python -m pip install easyocr
-python -m pip install craft-text-detector
 python -m pip install -r requirements.txt
 ```
 2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
@@ -78,7 +75,6 @@ python -m pip install -r requirements.txt
 ```
 git clone https://github.com/A2va/ImageTranslator.git
 python -m pip install easyocr
-python -m pip install craft-text-detector
 python -m pip install -r requirements.txt
 ```
 2. Install tesseract (v4.1.0)
