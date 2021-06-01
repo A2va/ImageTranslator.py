@@ -136,6 +136,9 @@ class ImageTranslator():
             self.translator = 'google'
 
     def translate(self) -> np.ndarray:
+        """Processing of the input image and
+        direct translation"""
+
         if self.img_process is None:
             self.processing()
         self.img_out = self.img_process.copy()
@@ -145,19 +148,28 @@ class ImageTranslator():
                 self.__apply_translation(self.text[i])
         return self.img_out
 
-    def get_text(self) -> List:
+    def get_text(self) -> List[Paragraph]:
+        """Return the text list"""
         return self.text
 
     def processing(self):
+        """Process the input image to detect text
+        and pass it to the ocr """
+
+        # Retrieve paragraph mask of the image
         self.img_process = self.img.copy()
         self.mask_paragraph = self.__detect_text(self.img)
+
+        # Split all paragraph into a list
         paragraphs: List[Paragraph] = self.__detect_paragraph()
+
         # Apply Binarization and ocr
         for paragraph in paragraphs:
             binary = TextBin(paragraph['image'])
             paragraph['image'] = binary.run()
-
             self.text.append(self.__run_ocr(paragraph))
+
+        # Draw a rectangle on the original text
         for i in range(0, len(self.text)):
             x: int = self.text[i]['x']
             y: int = self.text[i]['y']
@@ -166,6 +178,7 @@ class ImageTranslator():
             if self.text[i]['string'] != '':
                 cv2.rectangle(self.img_process, (x, y),
                               (x+w, y+h), (255, 255, 255), -1)
+                # Run the translator
                 self.text[i]['translated_string'] = self.run_translator(
                     self.text[i]['string'])
 
@@ -179,6 +192,7 @@ class ImageTranslator():
         reader = easyocr.Reader(['en'])  # Set lang placeholder
         boxes = reader.detect(img)[0]
 
+        # Draw a white rectangle on each detection
         for box in boxes:
             point1 = (int(box[0]), int(box[2]))
             point2 = (int(box[1]), int(box[3]))
@@ -188,13 +202,8 @@ class ImageTranslator():
 
     def __detect_paragraph(self) -> List[Paragraph]:
         """
-        Return a dict {
-             'image':cropped,
-             'x':x,
-             'y':y,
-             'w':w,
-             'h':h
-        }
+        Detect each paragraph with finding coutour
+        of the mask_paragraph
         """
         log.debug('Crop each paragraph')
         paragraph: List = []
@@ -207,6 +216,7 @@ class ImageTranslator():
         contours, hierarchy = cv2.findContours(dilated, cv2.RETR_EXTERNAL,
                                                cv2.CHAIN_APPROX_NONE)
 
+        # Crop the image to get only text
         for contour in contours:
 
             [x, y, w, h] = cv2.boundingRect(contour)
@@ -239,18 +249,7 @@ class ImageTranslator():
 
     def __run_tesserract(self, paragraph: Paragraph, lang_code: str) -> Paragraph:
         """
-            Return a dict
-            {
-                'x':x,
-                'y':y,
-                'w':w,
-                'h':h,
-                'paragraph_w':paragepah width,
-                'paragraph_h':paragraph height,
-                'string':string,
-                'image': image,
-                'max_width':max width of paragraph
-            }
+        Run tesserract ocr
         """
         boxes = pytesseract.image_to_data(paragraph['image'], lang=lang_code)
         string = ''
