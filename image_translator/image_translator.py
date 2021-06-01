@@ -143,9 +143,9 @@ class ImageTranslator():
             self.processing()
         self.img_out = self.img_process.copy()
         log.debug('Apply translation to image')
-        for i in range(0, len(self.text)):
-            if self.text[i]['string'] != '':
-                self.__apply_translation(self.text[i])
+        for i in self.text:
+            if i['string'] != '':
+                self.__apply_translation(i)
         return self.img_out
 
     def get_text(self) -> List[Paragraph]:
@@ -170,17 +170,17 @@ class ImageTranslator():
             self.text.append(self.__run_ocr(paragraph))
 
         # Draw a rectangle on the original text
-        for i in range(0, len(self.text)):
-            x: int = self.text[i]['x']
-            y: int = self.text[i]['y']
-            w: int = self.text[i]['paragraph_w']
-            h: int = self.text[i]['paragraph_h']
-            if self.text[i]['string'] != '':
+        for i in self.text:
+            x: int = i['x']
+            y: int = i['y']
+            w: int = i['paragraph_w']
+            h: int = i['paragraph_h']
+            if i['string'] != '':
                 cv2.rectangle(self.img_process, (x, y),
                               (x+w, y+h), (255, 255, 255), -1)
                 # Run the translator
-                self.text[i]['translated_string'] = self.run_translator(
-                    self.text[i]['string'])
+                i['translated_string'] = self.run_translator(
+                    i['string'])
 
     def __detect_text(self, img: np.ndarray) -> np.ndarray:
         """
