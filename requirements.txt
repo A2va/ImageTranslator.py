@@ -5,5 +5,3 @@ pytesseract
 PyBinglate
 pyppeteer
 pyquery
-tqdm
-selenium
