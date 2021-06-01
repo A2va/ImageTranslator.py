@@ -222,3 +222,6 @@ class DeepL:
 
         return res
 
+if __name__ =='__main__':
+    tra = DeepL('This is a test', 'en', 'fr')
+    print(tra.translate()) 

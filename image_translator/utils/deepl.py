@@ -133,5 +133,6 @@ class DeepL:
         return res
 
 
-tra = DeepL('This is a test', 'en', 'fr')
-print(tra.translate()) 
+if __name__ =='__main__':
+    tra = DeepL('This is a test', 'en', 'fr')
+    print(tra.translate()) 
