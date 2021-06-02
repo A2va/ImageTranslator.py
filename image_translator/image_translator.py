@@ -251,7 +251,8 @@ class ImageTranslator():
         """
         Run tesserract ocr
         """
-        boxes = pytesseract.image_to_data(paragraph['image'], lang=lang_code)
+        boxes1 = pytesseract.image_to_data(paragraph['image'], lang=lang_code, output_type=pytesseract.Output.DICT)
+        boxes = pytesseract.image_to_data(paragraph['image'], lang=lang_code, output_type=pytesseract.Output.STRING)
         string = ''
         x, y, w, h = (0, 0, 0, 0)
         first: bool = True
@@ -266,19 +267,19 @@ class ImageTranslator():
                         h = int(b[9])
                         first = False
                     string = string + str(b[11])+' '
-        return {
-            'x': x + paragraph['x'] - 40,
-            'y': y + paragraph['y'] - 15,
-            'w': w,
-            'h': h,
-            'paragraph_w': paragraph['w'] + 20,
-            'paragraph_h': paragraph['h'] + 20,
-            'string': string,
-            'image': paragraph['image'],
-            'max_width': paragraph['w'],
-            # Only for Cantarell -> Find a solution for all fonts
-            'font_size': int(h*1.1)
-        }
+
+        paragraph['x'] = x + paragraph['x'] - 40
+        paragraph['y'] = y + paragraph['y'] - 15
+        paragraph['w'] = w
+        paragraph['h'] = h
+        paragraph['paragraph_w'] = paragraph['w'] + 30
+        paragraph['paragraph_h'] = paragraph['h'] + 30
+        paragraph['max_width'] = paragraph['w']
+        # Only for Cantarell -> Find a solution for all fonts
+        paragraph['font_size'] = int(h*1.1)
+        paragraph['string'] = string
+
+        return paragraph
 
     def __run_easyocr(self, paragraph: Paragraph, lang_code: str) -> Paragraph:
         """
@@ -298,19 +299,19 @@ class ImageTranslator():
         string: str = ''
         for res in result:
             string += res[1]
-        return {
-            'x': x + paragraph['x'] - 40,
-            'y': y + paragraph['y'] - 15,
-            'w': w,
-            'h': h,
-            'paragraph_w': paragraph['w'] + 20,
-            'paragraph_h': paragraph['h'] + 20,
-            'string': string,
-            'image':  paragraph['image'],
-            'max_width': paragraph['w'],
-            # Only for Cantarell -> Find a solution for all fonts
-            'font_size': int(h*1.1)
-        }
+
+        paragraph['x'] = x + paragraph['x'] - 40
+        paragraph['y'] = y + paragraph['y'] - 15
+        paragraph['w'] = w
+        paragraph['h'] = h
+        paragraph['paragraph_w'] = paragraph['w'] + 20
+        paragraph['paragraph_h'] = paragraph['h'] + 20
+        paragraph['max_width'] = paragraph['w']
+        # Only for Cantarell -> Find a solution for all fonts
+        paragraph['font_size'] = int(h*1.1)
+        paragraph['string'] = string
+
+        return paragraph
 
     @staticmethod
     def reformat_input(image: Union[PIL_Img.Image, np.ndarray, str]) -> np.ndarray:
