@@ -66,6 +66,28 @@ OCR = {
 }
 
 
+def convert_tesserract_output(data, x: int, y: int):
+    out = []
+    for item in zip(data['text'], data['left'], data['top'], data['width'], data['height']):
+        if item[0] != '':
+            out.append({
+                'text': item[0],
+                'x': item[1] + x - 5,
+                'y': item[2] + y - 5,
+                'w': item[3] + 5,
+                'h': item[4] + 5
+            })
+    return out
+
+
+class Boxes(TypedDict):
+    x: int
+    y: int
+    w: int
+    h: int
+    word: str
+
+
 class Paragraph(TypedDict):
     x: int
     y: int
@@ -77,6 +99,7 @@ class Paragraph(TypedDict):
     image: np.ndarray
     max_width: int
     translated_string: str
+    word_list: List
 
 
 class UnknownLanguage(Exception):
@@ -144,6 +167,8 @@ class ImageTranslator():
         self.img_out = self.img_process.copy()
         log.debug('Apply translation to image')
         for i in self.text:
+            # Draw a rectangle on the original text
+            self.__draw_rectangle(i['word_list'])
             if i['string'] != '':
                 self.__apply_translation(i)
         return self.img_out
@@ -169,25 +194,26 @@ class ImageTranslator():
             paragraph['image'] = binary.run()
             self.text.append(self.__run_ocr(paragraph))
 
-        # Draw a rectangle on the original text
+        # Run translator
         for i in self.text:
-            x: int = i['x']
-            y: int = i['y']
-            w: int = i['paragraph_w']
-            h: int = i['paragraph_h']
             if i['string'] != '':
-                cv2.rectangle(self.img_process, (x, y),
-                              (x+w, y+h), (255, 255, 255), -1)
                 # Run the translator
                 i['translated_string'] = self.run_translator(
                     i['string'])
+
+    def __draw_rectangle(self, word: List[Boxes]):
+
+        for item in word:
+            cv2.rectangle(self.img_out, (item['x'], item['y']), (
+                        item['x']+item['w'], item['y'] + item['h']), (255, 255, 255), -1)
 
     def __detect_text(self, img: np.ndarray) -> np.ndarray:
         """
         Return a mask from the text location
         """
         log.debug('Run CRAFT text detector and create mask')
-        blank_image: np.ndarray = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
+        blank_image: np.ndarray = np.zeros(
+            (img.shape[0], img.shape[1], 3), np.uint8)
 
         reader = easyocr.Reader(['en'])  # Set lang placeholder
         boxes = reader.detect(img)[0]
@@ -251,33 +277,28 @@ class ImageTranslator():
         """
         Run tesserract ocr
         """
-        boxes1 = pytesseract.image_to_data(paragraph['image'], lang=lang_code, output_type=pytesseract.Output.DICT)
-        boxes = pytesseract.image_to_data(paragraph['image'], lang=lang_code, output_type=pytesseract.Output.STRING)
-        string = ''
-        x, y, w, h = (0, 0, 0, 0)
-        first: bool = True
-        for a, b in enumerate(boxes.splitlines()):
-            if a != 0:
-                b = b.split()
-                if len(b) == 12:
-                    if first:
-                        x = int(b[6])
-                        y = int(b[7])
-                        w = int(b[8])
-                        h = int(b[9])
-                        first = False
-                    string = string + str(b[11])+' '
+        boxes = pytesseract.image_to_data(
+            paragraph['image'], lang=lang_code, output_type=pytesseract.Output.DICT)
+        x: int = paragraph['x']
+        y: int = paragraph['y']
+        boxes = convert_tesserract_output(boxes, x, y)
+
+        x = boxes[0]['x']
+        y = boxes[0]['y']
+        text: str = ''
+        for item in boxes:
+            text += item['text']
+            text += ' '
 
         paragraph['x'] = x + paragraph['x'] - 40
         paragraph['y'] = y + paragraph['y'] - 15
-        paragraph['w'] = w
-        paragraph['h'] = h
+        paragraph['word_list'] = boxes
         paragraph['paragraph_w'] = paragraph['w'] + 30
         paragraph['paragraph_h'] = paragraph['h'] + 30
         paragraph['max_width'] = paragraph['w']
         # Only for Cantarell -> Find a solution for all fonts
-        paragraph['font_size'] = int(h*1.1)
-        paragraph['string'] = string
+        paragraph['font_size'] = int(boxes[0]['h']*1.1)
+        paragraph['string'] = text
 
         return paragraph
 
