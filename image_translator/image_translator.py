@@ -72,10 +72,10 @@ def convert_tesserract_output(data, x: int, y: int):
         if item[0] != '':
             out.append({
                 'text': item[0],
-                'x': item[1] + x - 5,
-                'y': item[2] + y - 5,
-                'w': item[3] + 5,
-                'h': item[4] + 5
+                'x': item[1] + x - 6,
+                'y': item[2] + y - 6,
+                'w': item[3] + 6,
+                'h': item[4] + 6
             })
     return out
 
@@ -205,7 +205,7 @@ class ImageTranslator():
 
         for item in word:
             cv2.rectangle(self.img_out, (item['x'], item['y']), (
-                        item['x']+item['w'], item['y'] + item['h']), (255, 255, 255), -1)
+                          item['x']+item['w'], item['y'] + item['h']), (255, 255, 255), -1)
 
     def __detect_text(self, img: np.ndarray) -> np.ndarray:
         """
@@ -285,13 +285,14 @@ class ImageTranslator():
 
         x = boxes[0]['x']
         y = boxes[0]['y']
+
         text: str = ''
         for item in boxes:
             text += item['text']
             text += ' '
 
-        paragraph['x'] = x + paragraph['x'] - 40
-        paragraph['y'] = y + paragraph['y'] - 15
+        paragraph['x'] = x - 40
+        paragraph['y'] = y - 15
         paragraph['word_list'] = boxes
         paragraph['paragraph_w'] = paragraph['w'] + 30
         paragraph['paragraph_h'] = paragraph['h'] + 30
