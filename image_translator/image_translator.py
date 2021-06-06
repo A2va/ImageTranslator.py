@@ -144,7 +144,7 @@ class ImageTranslator():
         # Test the language code for ocr and translator
         try:
             self.ocr_lang = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
-        except UnknownLanguage:
+        except KeyError:
             log.error(f'Language {self.ocr} is not available')
             raise UnknownLanguage(f'Language {self.ocr} is not available')
         if self.ocr_lang == 'invalid':
@@ -155,7 +155,7 @@ class ImageTranslator():
         try:
             self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
             self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
-        except UnknownLanguage:
+        except KeyError:
             log.error(f'Language {self.dest_lang} is not available')
             raise UnknownLanguage(
                 f'Language {self.dest_lang} is not available')
@@ -174,10 +174,10 @@ class ImageTranslator():
             self.processing()
         self.img_out = self.img_process.copy()
         log.debug('Apply translation to image')
-        for i in self.text:
+        for item in self.text:
             # Draw a rectangle on the original text
-            self.__draw_rectangle(i['word_list'])
-            if i['string'] != '':
+            self.__draw_rectangle(item['word_list'])
+            if item['text'] != '':
                 self.__apply_translation(i)
         return self.img_out
 
