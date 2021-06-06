@@ -419,7 +419,7 @@ class ImageTranslator():
         """
         Run translator between Google, Bing and DeepL
         """
-
+        log.debug('Run translator')
         if self.translator == 'google':
             return self.__run_google(text, self.trans_dest_lang,
                                      self.trans_src_lang)
