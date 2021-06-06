@@ -74,7 +74,7 @@ class Word(TypedDict):
     y2: int
     w: int
     h: int
-    word: str
+    text: str
 
 
 # Dicty type for paragraph
@@ -83,7 +83,7 @@ class Paragraph(TypedDict):
     y: int
     w: int
     h: int
-    string: str
+    text: str
     image: np.ndarray
     max_width: int
     translated_string: str
@@ -304,7 +304,7 @@ class ImageTranslator():
         paragraph['max_width'] = paragraph['w']
         # Only for Cantarell -> Find a solution for all fonts
         paragraph['font_size'] = int(words[0]['h']*1.1)
-        paragraph['string'] = text
+        paragraph['text'] = text
 
         return paragraph
 
@@ -354,7 +354,7 @@ class ImageTranslator():
         paragraph['max_width'] = paragraph['w']
         # Only for Cantarell -> Find a solution for all fonts
         paragraph['font_size'] = int(words[0]['h']*1.1)
-        paragraph['string'] = text
+        paragraph['text'] = text
 
         return paragraph
 
@@ -387,7 +387,7 @@ class ImageTranslator():
                       'string(file path or url), bytes, numpy array')
         return img
 
-    def __text_wrap(self, text: str, font: PIL_ImgFont.FreeTypeFont, max_width: int) -> List:
+    def __text_wrap(self, text: str, font: PIL_ImgFont.FreeTypeFont, max_width: int) -> List[str]:
         """
         Wrap the into multiple lines
         """
