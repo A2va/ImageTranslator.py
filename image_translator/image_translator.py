@@ -83,8 +83,6 @@ class Paragraph(TypedDict):
     y: int
     w: int
     h: int
-    paragraph_w: int
-    paragraph_h: int
     string: str
     image: np.ndarray
     max_width: int
@@ -303,8 +301,6 @@ class ImageTranslator():
         paragraph['x'] = x - 40
         paragraph['y'] = y - 15
         paragraph['word_list'] = words
-        paragraph['paragraph_w'] = paragraph['w'] + 30
-        paragraph['paragraph_h'] = paragraph['h'] + 30
         paragraph['max_width'] = paragraph['w']
         # Only for Cantarell -> Find a solution for all fonts
         paragraph['font_size'] = int(words[0]['h']*1.1)
@@ -355,8 +351,6 @@ class ImageTranslator():
         paragraph['x'] = x - 40
         paragraph['y'] = y - 15
         paragraph['word_list'] = words
-        paragraph['paragraph_w'] = paragraph['w'] + 20
-        paragraph['paragraph_h'] = paragraph['h'] + 20
         paragraph['max_width'] = paragraph['w']
         # Only for Cantarell -> Find a solution for all fonts
         paragraph['font_size'] = int(words[0]['h']*1.1)
