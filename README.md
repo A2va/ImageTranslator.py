@@ -37,7 +37,7 @@ python -m pip git+git://github.com/A2va/ImageTranslator@master#egg=ImageTranslat
 4. Place the extracted files into the *tesseract-ocr* folder at the root of package
 5. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
 6. Place the traineddata files into the tessdata folder.
-7. Download models from EasyOCR `python -m image_translator.download_model`.
+7. Download models from EasyOCR `python -m download`.
 *Note: Sometimes the progress bar stop so put a character on terminal*
 
 ### Linux
@@ -49,7 +49,7 @@ python -m pip git+git://github.com/A2va/ImageTranslator@master#egg=ImageTranslat
 2. Install tesseract (v4.1.0)
 3. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
 4. Place the traineddata files into the tessdata folder ('whereis tesseract').
-5. Download models from EasyOCR `python -m image_translator.download_model`.
+5. Download models from EasyOCR `python -m download`.
 *Note: Sometimes the progress bar stop so put a character on terminal*
 
 ## Development
@@ -67,7 +67,7 @@ python -m pip install -r requirements.txt
 4. Place the extracted files into the *tesseract-ocr* folder at the root of package
 5. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
 6. Place the traineddata files into the tessdata folder.
-7. Download models from EasyOCR `python -m image_translator.download_model`.
+7. Download models from EasyOCR `python -m download`.
 *Note: Sometimes the progress bar stop so put a character on terminal*
 
 ### Linux
@@ -80,5 +80,5 @@ python -m pip install -r requirements.txt
 2. Install tesseract (v4.1.0)
 3. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
 4. Place the traineddata files into the tessdata folder ('whereis tesseract').
-5. Download models from EasyOCR `python -m image_translator.download_model`.
+5. Download models from EasyOCR `python -m download`.
 *Note: Sometimes the progress bar stop so put a character on terminal*
