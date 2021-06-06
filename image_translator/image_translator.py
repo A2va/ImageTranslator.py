@@ -86,7 +86,7 @@ class Paragraph(TypedDict):
     text: str
     image: np.ndarray
     max_width: int
-    translated_string: str
+    translated_text: str
     word_list: List[Word]
 
 
@@ -203,11 +203,11 @@ class ImageTranslator():
             self.text.append(self.__run_ocr(paragraph))
 
         # Run translator
-        for i in self.text:
-            if i['string'] != '':
+        for item in self.text:
+            if item['text'] != '':
                 # Run the translator
-                i['translated_string'] = self.run_translator(
-                    i['string'])
+                item['translated_text'] = self.run_translator(
+                    item['text'])
 
     def __draw_rectangle(self, word: List[Word]):
 
@@ -414,7 +414,7 @@ class ImageTranslator():
                 lines.append(line)
         return lines
 
-    def run_translator(self, text: str):
+    def run_translator(self, text: str) -> str:
         """
         Run translator between Google, Bing and DeepL
         """
@@ -429,7 +429,7 @@ class ImageTranslator():
             return self.__run_deepl(text, self.trans_dest_lang,
                                     self.trans_src_lang)
 
-    def __run_google(self, text: str, dest_lang: str, src_lang: str):
+    def __run_google(self, text: str, dest_lang: str, src_lang: str) -> str:
         """
         Run google translator
         """
@@ -439,7 +439,7 @@ class ImageTranslator():
 
         return string
 
-    def __run_bing(self, text: str, dest_lang: str, src_lang: str):
+    def __run_bing(self, text: str, dest_lang: str, src_lang: str) -> str:
         """
         Run bing translator
         """
@@ -448,7 +448,7 @@ class ImageTranslator():
 
         return string
 
-    def __run_deepl(self, text: str, dest_lang: str, src_lang: str):
+    def __run_deepl(self, text: str, dest_lang: str, src_lang: str) -> str:
         """
         Run deepl translator
         """
@@ -472,7 +472,7 @@ class ImageTranslator():
             encoding="unic")
 
         lines = self.__text_wrap(
-            text['translated_string'],
+            text['translated_text'],
             font,
             text['max_width'])
         line_height = font.getsize('hg')[1]
