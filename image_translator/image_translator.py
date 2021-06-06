@@ -323,24 +323,44 @@ class ImageTranslator():
         #  |                            |
         # 4|----------------------------|3
         # [[[x1,y1],[x2,y2][x3,y3],[x4,y4],text],confidence]
-        x: int = result[0][0][0][0]
-        y: int = result[0][0][0][1]
-        w: int = result[0][0][2][0] - x
-        h: int = result[0][0][2][1] - y
-        string: str = ''
-        for res in result:
-            string += res[1]
 
-        paragraph['x'] = x + paragraph['x'] - 40
-        paragraph['y'] = y + paragraph['y'] - 15
-        paragraph['w'] = w
-        paragraph['h'] = h
+        x: int = paragraph['x']
+        y: int = paragraph['y']
+
+        words: List[Word] = []
+        for item in result:
+
+            point1: tuple = item[0][0]
+            point2: tuple = item[0][2]
+            x1: int = point1[0] + x
+            y1: int = point1[1] + y
+            words.append({
+                'text': item[1],
+                'x1': x1 - 6,
+                'y1': y1 - 6,
+                'x2': point2[0] + x1 + 6,
+                'y2': point2[1] + y1 + 6,
+                'w': point2[0] - point1[0] + 6,
+                'h': point2[1] - point1[1] + 6
+                })
+
+        text: str = ''
+        for item in words:
+            text += item['text']
+            text += ' '
+
+        x = words[0]['x1']
+        y = words[0]['y1']
+
+        paragraph['x'] = x - 40
+        paragraph['y'] = y - 15
+        paragraph['word_list'] = words
         paragraph['paragraph_w'] = paragraph['w'] + 20
         paragraph['paragraph_h'] = paragraph['h'] + 20
         paragraph['max_width'] = paragraph['w']
         # Only for Cantarell -> Find a solution for all fonts
-        paragraph['font_size'] = int(h*1.1)
-        paragraph['string'] = string
+        paragraph['font_size'] = int(words[0]['h']*1.1)
+        paragraph['string'] = text
 
         return paragraph
 
