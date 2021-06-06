@@ -49,8 +49,9 @@ log = logging.getLogger('image_translator')
 fileHandler = logging.FileHandler('latest.log')
 fileHandler.setFormatter(logFormatter)
 log.addHandler(fileHandler)
+log.addHandler(logging.StreamHandler())
 
-log.setLevel(logging.WARNING)
+log.setLevel(logging.DEBUG)
 
 if sys.platform == 'win32':
     pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
@@ -178,7 +179,7 @@ class ImageTranslator():
             # Draw a rectangle on the original text
             self.__draw_rectangle(item['word_list'])
             if item['text'] != '':
-                self.__apply_translation(i)
+                self.__apply_translation(item)
         return self.img_out
 
     def get_text(self) -> List[Paragraph]:
