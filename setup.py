@@ -15,6 +15,7 @@
 
 from setuptools import setup, find_packages
 
+
 def load_requirements(path):
     requirements = []
     with open(path) as f:
@@ -32,13 +33,15 @@ def load_requirements(path):
 required_packages = load_requirements("./requirements.txt")
 
 
-
 setup(
     name='ImageTranslator',
     version='0.1a',
     url='https://github.com/A2va/ImageTranslator.git',
     author='A2va',
     description='An image translator packages',
-    packages=find_packages(),    
-    install_requires=required_packages
+    packages=find_packages(),
+    install_requires=required_packages,
+    entry_points={
+        'console_scripts': ['download = image_translator.image_translator:download'],
+    }
 )
