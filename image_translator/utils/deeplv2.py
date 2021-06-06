@@ -30,6 +30,7 @@ from timeit import default_timer
 from urllib.parse import quote
 
 from pyppeteer import launch
+import pyppeteer.chromium_downloader as chromium
 from pyquery import PyQuery as pq
 
 
@@ -71,6 +72,7 @@ class DeepL:
                 # autoClose=False,
                 headless=1,
                 dumpio=True,
+                executablePath=f'./chromium/{chromium.REVISION}/{chromium.windowsArchive}/chrome.exe'
             )
         except Exception as exc:
             log.error("get_ppbrowser exc: %s", exc)
