@@ -66,28 +66,18 @@ OCR = {
 }
 
 
-def convert_tesserract_output(data, x: int, y: int):
-    out = []
-    for item in zip(data['text'], data['left'], data['top'], data['width'], data['height']):
-        if item[0] != '':
-            out.append({
-                'text': item[0],
-                'x': item[1] + x - 6,
-                'y': item[2] + y - 6,
-                'w': item[3] + 6,
-                'h': item[4] + 6
-            })
-    return out
-
-
-class Boxes(TypedDict):
-    x: int
-    y: int
+# Dict type to represent a word or words
+class Word(TypedDict):
+    x1: int
+    y1: int
+    x2: int
+    y2: int
     w: int
     h: int
     word: str
 
 
+# Dicty type for paragraph
 class Paragraph(TypedDict):
     x: int
     y: int
@@ -99,7 +89,27 @@ class Paragraph(TypedDict):
     image: np.ndarray
     max_width: int
     translated_string: str
-    word_list: List
+    word_list: List[Word]
+
+
+def convert_tesserract_output(data, x: int, y: int) -> List[Word]:
+    word: List[Word] = []
+    for item in zip(data['text'], data['left'], data['top'], data['width'], data['height']):
+        if item[0] != '':
+            x1: int = item[1] + x
+            y1: int = item[2] + y
+            x2: int = item[3] + x1
+            y2: int = item[4] + y1
+            word.append({
+                'text': item[0],
+                'x1': x1 - 6,
+                'y1': y1 - 6,
+                'x2': x2 + 6,
+                'y2': y2 + 6,
+                'w': item[3] + 6,
+                'h': item[4] + 6
+            })
+    return word
 
 
 class UnknownLanguage(Exception):
@@ -201,11 +211,11 @@ class ImageTranslator():
                 i['translated_string'] = self.run_translator(
                     i['string'])
 
-    def __draw_rectangle(self, word: List[Boxes]):
+    def __draw_rectangle(self, word: List[Word]):
 
         for item in word:
-            cv2.rectangle(self.img_out, (item['x'], item['y']), (
-                          item['x']+item['w'], item['y'] + item['h']), (255, 255, 255), -1)
+            cv2.rectangle(self.img_out, (item['x1'], item['y1']), (
+                          item['x2'], item['y2']), (255, 255, 255), -1)
 
     def __detect_text(self, img: np.ndarray) -> np.ndarray:
         """
@@ -281,24 +291,23 @@ class ImageTranslator():
             paragraph['image'], lang=lang_code, output_type=pytesseract.Output.DICT)
         x: int = paragraph['x']
         y: int = paragraph['y']
-        boxes = convert_tesserract_output(boxes, x, y)
+        words: List[Word] = convert_tesserract_output(boxes, x, y)
 
-        x = boxes[0]['x']
-        y = boxes[0]['y']
-
+        x = words[0]['x1']
+        y = words[0]['y1']
         text: str = ''
-        for item in boxes:
+        for item in words:
             text += item['text']
             text += ' '
 
         paragraph['x'] = x - 40
         paragraph['y'] = y - 15
-        paragraph['word_list'] = boxes
+        paragraph['word_list'] = words
         paragraph['paragraph_w'] = paragraph['w'] + 30
         paragraph['paragraph_h'] = paragraph['h'] + 30
         paragraph['max_width'] = paragraph['w']
         # Only for Cantarell -> Find a solution for all fonts
-        paragraph['font_size'] = int(boxes[0]['h']*1.1)
+        paragraph['font_size'] = int(words[0]['h']*1.1)
         paragraph['string'] = text
 
         return paragraph
