@@ -1,4 +1,6 @@
 from typing import TypedDict, List
+import numpy as np
+
 
 # Dict type to represent a word or words
 class Word(TypedDict):
