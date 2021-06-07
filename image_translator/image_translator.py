@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import List, Optional, Union, TypedDict
+from typing import List, Optional, Union
+from image_translator.type import Paragraph, Word
 
 # Image
 import cv2
@@ -65,30 +66,6 @@ OCR = {
     'tesseract': 0,
     'easyocr': 1
 }
-
-
-# Dict type to represent a word or words
-class Word(TypedDict):
-    x1: int
-    y1: int
-    x2: int
-    y2: int
-    w: int
-    h: int
-    text: str
-
-
-# Dicty type for paragraph
-class Paragraph(TypedDict):
-    x: int
-    y: int
-    w: int
-    h: int
-    text: str
-    image: np.ndarray
-    max_width: int
-    translated_text: str
-    word_list: List[Word]
 
 
 def convert_tesserract_output(data, x: int, y: int) -> List[Word]:
@@ -177,7 +154,7 @@ class ImageTranslator():
         log.debug('Apply translation to image')
         for item in self.text:
             # Draw a rectangle on the original text
-            self.__draw_rectangle(item['word_list'])
+            self.__draw_rectangle(item['word_list'], self.img_out)
             if item['text'] != '':
                 self.__apply_translation(item)
         return self.img_out
@@ -209,11 +186,12 @@ class ImageTranslator():
                 # Run the translator
                 item['translated_text'] = self.run_translator(
                     item['text'])
+                self.__draw_rectangle(item['word_list'], self.img_process)
 
-    def __draw_rectangle(self, word: List[Word]):
+    def __draw_rectangle(self, word: List[Word], img: np.ndarray):
 
         for item in word:
-            cv2.rectangle(self.img_out, (item['x1'], item['y1']), (
+            cv2.rectangle(img, (item['x1'], item['y1']), (
                           item['x2'], item['y2']), (255, 255, 255), -1)
 
     def __detect_text(self, img: np.ndarray) -> np.ndarray:
