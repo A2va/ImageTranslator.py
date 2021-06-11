@@ -34,9 +34,9 @@ If you want to develop use git clone instead of pip installation
 python -m pip git+git://github.com/A2va/ImageTranslator
 ```
 
-Use get_components command to download additionnal components.
+Use get-components command to download additionnal components.
 ```
-get_components --mode all
+get-components --mode all
 ```
 You can replace all mode by one them:
 * tesseract : Download [tessdata_best](https://github.com/tesseract-ocr/tessdata_best), store it in the tesseract path. 
