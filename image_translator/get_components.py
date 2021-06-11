@@ -16,14 +16,15 @@
 import image_translator.download.model_easyocr as easyocr
 import image_translator.download.model_tesseract as tesseract
 import image_translator.download.chromium as pyppeteer
+
 import getopt
 import sys
 
 short_options = "m:"
 long_options = ["mode="]
 
-if __name__ == "__main__":
 
+def main():
     args = sys.argv
     args = args[1:]
 
@@ -32,6 +33,9 @@ if __name__ == "__main__":
     except getopt.error as err:
         print(str(err))
         sys.exit(2)
+
+    if not arguments:
+        print('Error: Any argument are provided')
 
     for arg, value in arguments:
         if arg in ("-m", "--mode"):
@@ -49,3 +53,7 @@ if __name__ == "__main__":
                 print("Error: Wrong argument value")
         else:
             print("Error: Wrong argument")
+
+
+if __name__ == "__main__":
+    main()
