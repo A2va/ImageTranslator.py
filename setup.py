@@ -41,5 +41,7 @@ setup(
     description='An image translator packages',
     packages=find_packages(),
     install_requires=required_packages,
-    scripts=['image_translator/download.py']
+    entry_points={
+        'console_scripts': ['get-components=image_translator.get_components:main']
+    }
 )
