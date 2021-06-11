@@ -30,8 +30,8 @@ def download_models():
             detection_models['craft']['url'], detector_filename, 'easyocr/model', detector_filename)
 
     print('EasyOCR models:\n')
-    for model in recognition_models['gen2']:
-        url = recognition_models['gen2'][model]['url']
-        filename = recognition_models['gen2'][model]['filename']
+    for model in recognition_models['gen1']:
+        url = recognition_models['gen1'][model]['url']
+        filename = recognition_models['gen1'][model]['filename']
         if not os.path.exists(f'easyocr/model/{filename}'):
             download_and_unzip(url, filename, 'easyocr/model', filename)
