@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from easyocr.config import recognition_models, detection_models
-from image_translator.model.download import download_and_unzip
+from image_translator.download.download import download_and_unzip
 import os
 
 

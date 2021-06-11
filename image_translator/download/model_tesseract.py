@@ -15,7 +15,7 @@
 
 # URL: https://github.com/tesseract-ocr/tessdata_best/archive/master.zip
 
-from image_translator.model.download import download_and_unzip
+from image_translator.download.download import download_and_unzip
 import sys
 import subprocess
 
