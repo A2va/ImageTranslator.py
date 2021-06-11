@@ -49,6 +49,7 @@ def main():
                 print('Download all models')
                 easyocr.download_models()
                 tesseract.download_models()
+                pyppeteer.download_chromium()
             else:
                 print("Error: Wrong argument value")
         else:

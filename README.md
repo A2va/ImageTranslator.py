@@ -25,60 +25,20 @@ image_out=translator.img_out
 ```
 ## Installation
 
-### Windows
-1. Install the package
 ```
 python -m pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 python -m pip install easyocr
-python -m pip git+git://github.com/A2va/ImageTranslator@master#egg=ImageTranslator
 ```
-2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
-3. Extract the files into executable (ex: 7-Zip)
-4. Place the extracted files into the *tesseract-ocr* folder at the root of package
-5. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
-6. Place the traineddata files into the tessdata folder.
-7. Download models from EasyOCR `python -m download`.
-*Note: Sometimes the progress bar stop so put a character on terminal*
+If you want to develop use git clone instead of pip installation
+```
+python -m pip git+git://github.com/A2va/ImageTranslator
+```
 
-### Linux
-1. Install the package
+Use get_components command to download additionnal components.
 ```
-python -m pip install easyocr
-python -m pip git+git://github.com/A2va/ImageTranslator@master#egg=ImageTranslator
+get_components --mode all
 ```
-2. Install tesseract (v4.1.0)
-3. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
-4. Place the traineddata files into the tessdata folder ('whereis tesseract').
-5. Download models from EasyOCR `python -m download`.
-*Note: Sometimes the progress bar stop so put a character on terminal*
-
-## Development
-
-### Windows
-1. Clone the repositoy
-```
-git clone https://github.com/A2va/ImageTranslator.git
-python -m pip install torch==1.7.0+cpu torchvision==0.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
-python -m pip install easyocr
-python -m pip install -r requirements.txt
-```
-2. Download the 4.1.0 version of [tesseract](https://digi.bib.uni-mannheim.de/tesseract/)
-3. Extract the files into executable (ex: 7-Zip)
-4. Place the extracted files into the *tesseract-ocr* folder at the root of package
-5. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
-6. Place the traineddata files into the tessdata folder.
-7. Download models from EasyOCR `python -m download`.
-*Note: Sometimes the progress bar stop so put a character on terminal*
-
-### Linux
-1. Clone the repositoy
-```
-git clone https://github.com/A2va/ImageTranslator.git
-python -m pip install easyocr
-python -m pip install -r requirements.txt
-```
-2. Install tesseract (v4.1.0)
-3. Download [tessdata](https://github.com/tesseract-ocr/tessdata) or [tessdata_best](https://github.com/tesseract-ocr/tessdata_best)
-4. Place the traineddata files into the tessdata folder ('whereis tesseract').
-5. Download models from EasyOCR `python -m download`.
-*Note: Sometimes the progress bar stop so put a character on terminal*
+You can replace all mode by one them:
+* tesseract : Download [tessdata_best](https://github.com/tesseract-ocr/tessdata_best), store it in the tesseract path. 
+* easyocr: Download all easyocr models
+* pyppeteer: Download chromium for using pyppeteer
