@@ -98,7 +98,7 @@ class ImageTranslator():
     """
 
     def __init__(self, img: Union[PIL_Img.Image, np.ndarray, str], ocr: str,
-                 translator: str, src_lang: str, dest_lang: str):
+                 translator: str, src_lang: str, dest_lang: str, gpu: bool = False):
         """
         img: path file, bytes URL, Pillow/OpenCV image and data URI\n
         ocr: 'tesseract' or 'easyocr'\n
@@ -119,6 +119,8 @@ class ImageTranslator():
         self.trans_src_lang: str = ''
         self.trans_dest_lang: str = ''
 
+        self.gpu = gpu
+
         # Test the language code for ocr and translator
         try:
             self.ocr_lang = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
@@ -138,7 +140,7 @@ class ImageTranslator():
             raise UnknownLanguage(
                 f'Language {self.dest_lang} is not available')
         if src_lang == 'invalid' or dest_lang == 'invalid':
-            log.warning(f'The {self.translator} ocr has no {self.src_lang}'
+            log.warning(f'The {self.translator} translator has no {self.src_lang}'
                         f'or {self.dest_lang}.Switch to google')
             self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS['google']]
             self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
@@ -202,7 +204,7 @@ class ImageTranslator():
         blank_image: np.ndarray = np.zeros(
             (img.shape[0], img.shape[1], 3), np.uint8)
 
-        reader = easyocr.Reader(['en'])  # Set lang placeholder
+        reader = easyocr.Reader(['en'], gpu=self.gpu)  # Set lang placeholder
         boxes = reader.detect(img)[0]
 
         # Draw a white rectangle on each detection
@@ -291,7 +293,7 @@ class ImageTranslator():
         """
         Run EasyOCR
         """
-        reader = easyocr.Reader([lang_code], gpu=False,
+        reader = easyocr.Reader([lang_code], gpu=self.gpu,
                                 model_storage_directory='easyocr/model')
         result: List = reader.readtext(paragraph['image'])
         # 1|----------------------------|2
