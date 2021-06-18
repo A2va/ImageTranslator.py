@@ -204,7 +204,8 @@ class ImageTranslator():
         blank_image: np.ndarray = np.zeros(
             (img.shape[0], img.shape[1], 3), np.uint8)
 
-        reader = easyocr.Reader(['en'], gpu=self.gpu)  # Set lang placeholder
+        reader = easyocr.Reader(['en'], gpu=self.gpu,  # Set lang placeholder
+                                model_storage_directory='easyocr/model')
         boxes = reader.detect(img)[0]
 
         # Draw a white rectangle on each detection
