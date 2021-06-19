@@ -1,8 +1,7 @@
 opencv-python-headless
 Pillow
-googletrans
+googletrans==4.0.0rc1
 pytesseract
 PyBinglate
 pyppeteer
 pyquery
-tqdm

@@ -21,7 +21,7 @@
 # SOFTWARE
 # https://github.com/ffreemt/deepl-tr-async
 
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 # import os
 
@@ -30,10 +30,11 @@ from timeit import default_timer
 from urllib.parse import quote
 
 from pyppeteer import launch
+import pyppeteer.chromium_downloader as chromium
 from pyquery import PyQuery as pq
 
 
-#Logging
+# Logging
 import logging
 log = logging.getLogger('image_translator')
 
@@ -71,6 +72,7 @@ class DeepL:
                 # autoClose=False,
                 headless=1,
                 dumpio=True,
+                executablePath=f'./chromium/{chromium.REVISION}/{chromium.windowsArchive}/chrome.exe'
             )
         except Exception as exc:
             log.error("get_ppbrowser exc: %s", exc)
@@ -80,9 +82,9 @@ class DeepL:
     async def deepl_tr_async(
             self,
             text: str,
-            from_lang: str="auto",
-            to_lang: str="auto",
-            waitfor: Optional[float]=None,
+            from_lang: str = "auto",
+            to_lang: str = "auto",
+            waitfor: Optional[float] = None,
     ) -> Optional[str]:
         """ deepl via pyppeteer
         from_lang = 'de'
@@ -208,7 +210,6 @@ class DeepL:
         if loop.is_closed():
             loop = asyncio.new_event_loop()
 
-        sents = self.text
         self.browser = LOOP.run_until_complete(self.get_ppbrowser())
         try:
             res = loop.run_until_complete(
@@ -223,3 +224,6 @@ class DeepL:
 
         return res
 
+if __name__ =='__main__':
+    tra = DeepL('This is a test', 'en', 'fr')
+    print(tra.translate()) 
