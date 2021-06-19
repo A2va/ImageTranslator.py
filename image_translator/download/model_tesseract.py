@@ -15,7 +15,7 @@
 
 # URL: https://github.com/tesseract-ocr/tessdata_best/archive/master.zip
 
-from download import download_and_unzip
+from image_translator.download.download import download_and_unzip
 import sys
 import subprocess
 
@@ -30,5 +30,4 @@ def download_models():
 
 
 if __name__ == "__main__":
-
     download_models()
