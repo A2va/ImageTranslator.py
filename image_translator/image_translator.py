@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import List, Optional, Union
-from image_translator.type import Paragraph, Word
+from image_translator.types import Paragraph, Word
 
 # Image
 import cv2
@@ -178,8 +178,6 @@ class ImageTranslator():
 
         # Apply Binarization and ocr
         for paragraph in paragraphs:
-            binary = TextBin(paragraph['image'])
-            paragraph['image'] = binary.run()
             self.text.append(self.__run_ocr(paragraph))
 
         # Run translator
@@ -236,15 +234,28 @@ class ImageTranslator():
         for contour in contours:
 
             [x, y, w, h] = cv2.boundingRect(contour)
+            cropped_mask = self.mask_paragraph[y:y + h, x:x + w]
             cropped: np.ndarray = img[y:y + h, x:x + w]
 
             cropped = cv2.bitwise_and(
                 cropped,
-                self.mask_paragraph[y:y + h, x:x + w])
+                cropped_mask)
+
+            binary = TextBin(cropped)
+            bin_image = binary.run()
+
+            indices = np.where(bin_image == [0])
+            coordinates = tuple(zip(indices[0], indices[1]))
+
+            # Reverse the numpy array to get RGB color and not BGR
+            # Note: BGR format is the default format for opencv
+            text_color = tuple(np.flip(cropped[coordinates[0]]))
 
             # Apply binarization
             paragraph.append({
                 'image': cropped,
+                'bin_image': bin_image,
+                'text_color': text_color,
                 'x': x,
                 'y': y,
                 'w': w,
@@ -268,7 +279,7 @@ class ImageTranslator():
         Run tesserract ocr
         """
         boxes = pytesseract.image_to_data(
-            paragraph['image'], lang=lang_code, output_type=pytesseract.Output.DICT)
+            paragraph['bin_image'], lang=lang_code, output_type=pytesseract.Output.DICT)
         x: int = paragraph['x']
         y: int = paragraph['y']
         words: List[Word] = convert_tesserract_output(boxes, x, y)
@@ -296,7 +307,7 @@ class ImageTranslator():
         """
         reader = easyocr.Reader([lang_code], gpu=self.gpu,
                                 model_storage_directory='easyocr/model')
-        result: List = reader.readtext(paragraph['image'])
+        result: List = reader.readtext(paragraph['bin_image'])
         # 1|----------------------------|2
         #  |                            |
         # 4|----------------------------|3
