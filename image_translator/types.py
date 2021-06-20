@@ -1,4 +1,4 @@
-from typing import TypedDict, List
+from typing import TypedDict, List, Tuple
 import numpy as np
 
 
@@ -21,6 +21,8 @@ class Paragraph(TypedDict):
     h: int
     text: str
     image: np.ndarray
+    bin_image: np.ndarray
+    text_color: Tuple(int, int, int)
     max_width: int
     translated_text: str
     word_list: List[Word]
