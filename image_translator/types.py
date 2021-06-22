@@ -22,7 +22,7 @@ class Paragraph(TypedDict):
     text: str
     image: np.ndarray
     bin_image: np.ndarray
-    text_color: Tuple(int, int, int)
+    text_color: Tuple[int, int, int]
     max_width: int
     translated_text: str
     word_list: List[Word]
