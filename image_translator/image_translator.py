@@ -156,7 +156,7 @@ class ImageTranslator():
         log.debug('Apply translation to image')
         for item in self.text:
             # Draw a rectangle on the original text
-            self.__draw_rectangle(item['word_list'], self.img_out)
+            #self.__draw_rectangle(item['word_list'], self.img_out)
             if item['text'] != '':
                 self.__apply_translation(item)
         return self.img_out
@@ -180,13 +180,18 @@ class ImageTranslator():
         for paragraph in paragraphs:
             self.text.append(self.__run_ocr(paragraph))
 
+        kernel = np.ones((5,5), np.uint8)
+        self.mask_paragraph = cv2.dilate(self.mask_paragraph, kernel, iterations=1)
+
+        self.img_process = cv2.inpaint(self.img, cv2.cvtColor(self.mask_paragraph,cv2.COLOR_BGR2GRAY), 3, cv2.INPAINT_NS)
+
         # Run translator
         for item in self.text:
             if item['text'] != '':
                 # Run the translator
                 item['translated_text'] = self.run_translator(
                     item['text'])
-                self.__draw_rectangle(item['word_list'], self.img_process)
+                #self.__draw_rectangle(item['word_list'], self.img_process)
 
     def __draw_rectangle(self, word: List[Word], img: np.ndarray):
 
@@ -246,7 +251,8 @@ class ImageTranslator():
 
             indices = np.where(bin_image == [0])
             coordinates = tuple(zip(indices[0], indices[1]))
-
+            self.mask_paragraph[y:y + h, x:x + w] = cv2.cvtColor(np.invert(bin_image),
+                             cv2.COLOR_GRAY2BGR)
             # Reverse the numpy array to get RGB color and not BGR
             # Note: BGR format is the default format for opencv
             text_color = tuple(np.flip(cropped[coordinates[0]]))
