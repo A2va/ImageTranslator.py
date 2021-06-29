@@ -477,6 +477,6 @@ class ImageTranslator():
         line_height = font.getsize('hg')[1]
         y = text['y']
         for line in lines:
-            draw.text((text['x'], y), line, fill=(0, 0, 0), font=font)
+            draw.text((text['x'], y), line, fill=text['text_color'][::-1], font=font)
             y = y + line_height
         self.img_out = np.asarray(im_pil)
