@@ -48,10 +48,9 @@ LOOP = asyncio.get_event_loop()
 
 
 class DeepL:
-    def __init__(self, text, dest_lang, src_lang):
+    def __init__(self, src_lang: str, dest_lang: str):
         self.src_lang = src_lang
         self.dest_lang = dest_lang
-        self.text = text
 
     async def get_ppbrowser(self):
         """ get a puppeeter browser.
@@ -107,7 +106,7 @@ class DeepL:
         page.setDefaultNavigationTimeout(0)
 
         url_ = f"{URL}#{self.src_lang}/{self.dest_lang}/{quote(text)}"
-        # url_ = f'{URL}#{from_lang}/{to_lang}/'
+        # # url_ = f'{URL}#{from_lang}/{to_lang}/'
 
         count = 0
         while count < 3:
@@ -139,7 +138,7 @@ class DeepL:
 
         # .lmt__message_box2__content
 
-        # await page.waitFor(2500)  # ms
+        await page.waitFor(2500)  # ms
 
         # wait for popup to be visible
 
@@ -161,42 +160,23 @@ class DeepL:
             await page.waitFor(_)
         except Exception as exc:
             log.warning(" page.waitFor exc: %s", exc)
-        try:
-            content = await page.content()
-        except Exception as exc:
-            log.warning(f" page.waitFor exc: {exc}")
-            content = '<div class="lmt__target_textarea">%s</div>' % exc
-        
-        # Waiting for a fix of pyppeteer
-        # element = await page.querySelector('.lmt__target_textarea')
-        # title = await page.evaluate('(element) => element.textContent', element)
-
-        count = -1
-        while count < 50:
-            count += 1
-            log.debug("extra %s x 100 ms", count + 1)
-            await page.waitFor(100)
-
-            content = await page.content()
-            doc = pq(content)
-            res = doc(".lmt__translations_as_text").text()
-            if 'Alternatives' in res:
-                res = res.split('\n')[1]
-            if res:
-                break
-            await asyncio.sleep(0)
-            await asyncio.sleep(0)
 
         log.debug("time: %.2f s", default_timer() - then)
+
+
+        output_area = await page.J(
+            'textarea[dl-test="translator-target-input"]')
+        res = await page.evaluate('elm => elm.value', output_area)
 
         await page.close()
 
         await asyncio.sleep(0.2)
 
-        return res
-
+        return res.rstrip('\n')
+    
     def translate(
             self,
+            text: str,
             # headless: bool = not HEADFUL,
             waitfor: Optional[float] = None,
             loop=None
@@ -214,7 +194,7 @@ class DeepL:
         try:
             res = loop.run_until_complete(
                 self.deepl_tr_async(
-                                    self.text,
+                                    text,
                                     from_lang=self.src_lang,
                                     to_lang=self.dest_lang,
                                     waitfor=waitfor))
@@ -225,5 +205,5 @@ class DeepL:
         return res
 
 if __name__ =='__main__':
-    tra = DeepL('This is a test', 'en', 'fr')
-    print(tra.translate()) 
+    tra = DeepL('en', 'fr')
+    print(tra.translate('This a test')) 

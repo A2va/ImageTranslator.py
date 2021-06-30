@@ -434,8 +434,8 @@ class ImageTranslator():
         """
         Run deepl translator
         """
-        tra = DeepL(text, dest_lang, src_lang)
-        string = tra.translate()
+        tra = DeepL(src_lang, dest_lang)
+        string = tra.translate(text)
 
         return string
 
