@@ -154,7 +154,10 @@ class ImageTranslator():
             self.processing()
         self.img_out = self.img_process.copy()
         log.debug('Apply translation to image')
-        for item in self.text:
+        for item in self.text:     
+            # Run the translator
+            item['translated_text'] = self.run_translator(
+                item['text'])
             # Draw a rectangle on the original text
             self.__draw_rectangle(item['word_list'], self.img_out)
             if item['text'] != '':
@@ -184,10 +187,7 @@ class ImageTranslator():
 
         # Run translator
         for item in self.text:
-            if item['text'] != '':
-                # Run the translator
-                item['translated_text'] = self.run_translator(
-                    item['text'])
+            if item['text'] != '':   
                 self.__draw_rectangle(item['word_list'], self.img_process)
 
     def __draw_rectangle(self, word: List[Word], img: np.ndarray):
