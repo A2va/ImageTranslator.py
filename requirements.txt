@@ -1,6 +1,6 @@
 opencv-python-headless
 Pillow
-googletrans==4.0.0rc1
+googletrans==3.1.0a0
 pytesseract
 PyBinglate
 pyppeteer
