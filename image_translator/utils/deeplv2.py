@@ -163,7 +163,6 @@ class DeepL:
 
         log.debug("time: %.2f s", default_timer() - then)
 
-
         output_area = await page.J(
             'textarea[dl-test="translator-target-input"]')
         res = await page.evaluate('elm => elm.value', output_area)
