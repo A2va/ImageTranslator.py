@@ -5,3 +5,5 @@ pytesseract
 PyBinglate
 pyppeteer
 pyquery
+lxml
+PyExecJS
