@@ -31,7 +31,7 @@ import pytesseract
 from image_translator.utils.text_binarization import TextBin
 # Translator
 from googletrans import Translator
-from PyBinglate import BingTranslator
+from image_translator.utils.bing import Bing
 from image_translator.utils.deeplv2 import DeepL
 from image_translator.utils import lang
 
@@ -154,7 +154,7 @@ class ImageTranslator():
             self.processing()
         self.img_out = self.img_process.copy()
         log.debug('Apply translation to image')
-        for item in self.text:     
+        for item in self.text:
             # Run the translator
             item['translated_text'] = self.run_translator(
                 item['text'])
@@ -187,7 +187,7 @@ class ImageTranslator():
 
         # Run translator
         for item in self.text:
-            if item['text'] != '':   
+            if item['text'] != '':
                 self.__draw_rectangle(item['word_list'], self.img_process)
 
     def __draw_rectangle(self, word: List[Word], img: np.ndarray):
@@ -425,7 +425,7 @@ class ImageTranslator():
         """
         Run bing translator
         """
-        tra = BingTranslator()
+        tra = Bing()
         string = tra.translate(text, dest_lang, src_lang)
 
         return string
