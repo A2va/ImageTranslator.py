@@ -125,8 +125,8 @@ class ImageTranslator():
         try:
             self.ocr_lang = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
         except KeyError:
-            log.error(f'Language {self.ocr} is not available')
-            raise UnknownLanguage(f'Language {self.ocr} is not available')
+            log.error(f'Language {self.src_lang} is not available')
+            raise UnknownLanguage(f'Language {self.src_lang} is not available')
         if self.ocr_lang == 'invalid':
             log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
                         f'Switch to tesseract')
