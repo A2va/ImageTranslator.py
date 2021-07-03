@@ -40,6 +40,11 @@ Use get-components command to download additionnal components.
 get-components --mode all
 ```
 You can replace all mode by one them:
-* tesseract : Download [tessdata_best](https://github.com/tesseract-ocr/tessdata_best), store it in the tesseract path. 
+* tesseract : Download [tessdata_best](https://github.com/tesseract-ocr/tessdata_best). Store it in the tesseract path (linux) or install in the project/tesseract/tessdata` (windows)
 * easyocr: Download all easyocr models
 * pyppeteer: Download chromium for using pyppeteer
+
+## Tests
+
+Run tests with this command:
+`python -m unittest`
