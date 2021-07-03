@@ -426,7 +426,7 @@ class ImageTranslator():
         Run bing translator
         """
         tra = Bing()
-        string = tra.translate(text, dest_lang, src_lang)
+        string = tra.translate(text, src_lang, dest_lang)
 
         return string
 
