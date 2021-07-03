@@ -159,7 +159,10 @@ class ImageTranslator():
             item['translated_text'] = self.run_translator(
                 item['text'])
             # Draw a rectangle on the original text
-            self.__draw_rectangle(item['word_list'], self.img_out)
+            pt1 = (item['x'],item['y'])
+            pt2 = (item['x']+item['w'],item['y']+item['h'])
+            cv2.rectangle(self.img_process, pt1, pt2,(255, 255, 255), -1)
+            #self.__draw_rectangle(item['word_list'], self.img_out)
             if item['text'] != '':
                 self.__apply_translation(item)
         return self.img_out
@@ -188,7 +191,10 @@ class ImageTranslator():
         # Run translator
         for item in self.text:
             if item['text'] != '':
-                self.__draw_rectangle(item['word_list'], self.img_process)
+                pt1 = (item['x'],item['y'])
+                pt2 = (item['x']+item['w'],item['y']+item['h'])
+                cv2.rectangle(self.img_process, pt1, pt2,(255, 255, 255), -1)
+                #self.__draw_rectangle(item['word_list'], self.img_process)
 
     def __draw_rectangle(self, word: List[Word], img: np.ndarray):
 
