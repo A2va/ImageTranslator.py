@@ -6,4 +6,4 @@ PyBinglate
 pyppeteer
 pyquery
 lxml
-PyExecJS
+Js2Py

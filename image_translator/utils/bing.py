@@ -34,7 +34,7 @@ from typing import Union
 
 import lxml.etree
 import requests
-import execjs
+import js2py
 import time
 import random
 import urllib
@@ -145,7 +145,7 @@ class Bing():
 
     def get_tk(self, host_html):
         result_str = re.compile('var params_RichTranslateHelper = (.*?);').findall(host_html)[0]
-        result = execjs.get().eval(result_str)
+        result = js2py.eval_js(result_str)
         return {'key': result[0], 'token': result[1]}
 
     def _bing_api(self, query_text: str, from_language: str = 'auto', to_language: str = 'en', **kwargs) -> Union[str, list]:
