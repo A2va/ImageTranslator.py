@@ -47,13 +47,9 @@ logFormatter = logging.Formatter(
     "[%(levelname)-5.5s]: "
     "%(message)s")
 log = logging.getLogger('image_translator')
-fileHandler = logging.FileHandler('latest.log')
-fileHandler.setFormatter(logFormatter)
 
 streamHandler = logging.StreamHandler()
 streamHandler.setFormatter(logFormatter)
-
-log.addHandler(fileHandler)
 log.addHandler(streamHandler)
 
 log.setLevel(logging.DEBUG)
