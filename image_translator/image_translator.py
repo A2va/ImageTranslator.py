@@ -49,8 +49,12 @@ logFormatter = logging.Formatter(
 log = logging.getLogger('image_translator')
 fileHandler = logging.FileHandler('latest.log')
 fileHandler.setFormatter(logFormatter)
+
+streamHandler = logging.StreamHandler()
+streamHandler.setFormatter(logFormatter)
+
 log.addHandler(fileHandler)
-log.addHandler(logging.StreamHandler())
+log.addHandler(streamHandler)
 
 log.setLevel(logging.DEBUG)
 
