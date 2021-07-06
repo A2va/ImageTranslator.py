@@ -23,7 +23,9 @@
 
 from typing import Any, Optional, Tuple, Union
 
-# import os
+import winreg
+import os
+import sys
 
 import asyncio
 from timeit import default_timer
@@ -31,9 +33,9 @@ from urllib.parse import quote
 
 from pyppeteer import launch
 import pyppeteer.chromium_downloader as chromium
-from pyquery import PyQuery as pq
 
 
+from shutil import which
 # Logging
 import logging
 log = logging.getLogger('image_translator')
@@ -46,6 +48,40 @@ HEADFUL = 1
 PROXY = ""
 LOOP = asyncio.get_event_loop()
 
+LOCAL_CHROMIUM = f'./chromium/{chromium.REVISION}/{chromium.windowsArchive}/chrome.exe'
+
+
+class NotFoundChrome(Exception):
+    pass
+
+
+def find_chromium_path() -> str:
+    """Find chromium or chrome path on system"""
+    path: str = ''
+    if sys.platform.startswith('linux'):
+        # Check existing program
+        if which('google-chrome') is not None:
+            path = 'google-chrome'
+        if which('chromium-browser') is not None:
+            path = 'chromium-browser'
+    elif sys.platform.startswith('win32'):
+        try:
+            # Find with registry
+            handle = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe")
+            path = winreg.EnumValue(handle, 0)[1]
+        except FileNotFoundError:
+            # Try local chromium
+            path = LOCAL_CHROMIUM
+            if not os.path.exists(path):
+                log.error('Not found chrome. Install chrome. Or use get components script')
+                raise NotFoundChrome('Not found chrome. Install chrome. Or use get components script')
+    else:
+        # Mac OS are not supported
+        log.error('Not found chrome. Install chrome. Or use get components script')
+        raise NotFoundChrome('Not found chrome. Install chrome. Or use get components script')
+
+    return path
+
 
 class DeepL:
     def __init__(self, src_lang: str, dest_lang: str):
@@ -56,6 +92,7 @@ class DeepL:
         """ get a puppeeter browser.
         headless=not HEADFUL; proxy: str = PROXY
         """
+        chromium_path: str = find_chromium_path()
         try:
             browser = await launch(
                 args=[
@@ -71,7 +108,7 @@ class DeepL:
                 # autoClose=False,
                 headless=1,
                 dumpio=True,
-                executablePath=f'./chromium/{chromium.REVISION}/{chromium.windowsArchive}/chrome.exe'
+                executablePath=chromium_path
             )
         except Exception as exc:
             log.error("get_ppbrowser exc: %s", exc)
@@ -129,7 +166,7 @@ class DeepL:
                                        {"timeout": 1000})  # ms
             log.debug("Succes getting source textarea")
         # except TimeoutError:
-        except Exception as exc:
+        except Exception:
             await asyncio.sleep(0.5)
             # raise
 
@@ -172,7 +209,7 @@ class DeepL:
         await asyncio.sleep(0.2)
 
         return res.rstrip('\n')
-    
+
     def translate(
             self,
             text: str,
@@ -203,6 +240,7 @@ class DeepL:
 
         return res
 
-if __name__ =='__main__':
+
+if __name__ == '__main__':
     tra = DeepL('en', 'fr')
-    print(tra.translate('This a test')) 
+    print(tra.translate('This a test'))
