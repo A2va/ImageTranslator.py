@@ -32,7 +32,7 @@ from image_translator.utils.text_binarization import TextBin
 # Translator
 from googletrans import Translator
 from image_translator.utils.bing import Bing
-from image_translator.utils.deeplv2 import DeepL
+from image_translator.utils.deepl import DeepL
 from image_translator.utils import lang
 
 import sys
