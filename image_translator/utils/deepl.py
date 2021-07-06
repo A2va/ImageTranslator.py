@@ -82,6 +82,8 @@ def find_chromium_path() -> str:
 
     return path
 
+CHROMIUM_PATH = find_chromium_path()
+
 
 class DeepL:
     def __init__(self, src_lang: str, dest_lang: str):
@@ -92,7 +94,6 @@ class DeepL:
         """ get a puppeeter browser.
         headless=not HEADFUL; proxy: str = PROXY
         """
-        chromium_path: str = find_chromium_path()
         try:
             browser = await launch(
                 args=[
@@ -108,7 +109,7 @@ class DeepL:
                 # autoClose=False,
                 headless=1,
                 dumpio=True,
-                executablePath=chromium_path
+                executablePath=CHROMIUM_PATH
             )
         except Exception as exc:
             log.error("get_ppbrowser exc: %s", exc)
