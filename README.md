@@ -35,6 +35,8 @@ If you want to develop use git clone instead of pip installation
 python -m pip git+git://github.com/A2va/ImageTranslator
 ```
 
+Install tesseract in ImageTranslator/tesseract-orc or for Linux with the package manager
+
 Use get-components command to download additionnal components.
 ```
 get-components --mode all
