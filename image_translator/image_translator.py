@@ -98,7 +98,8 @@ class ImageTranslator():
     """
 
     def __init__(self, img: Union[PIL_Img.Image, np.ndarray, str], ocr: str,
-                 translator: str, src_lang: str, dest_lang: str, gpu: bool = False):
+                 translator: str, src_lang: str, dest_lang: str,
+                 gpu: bool = False, inpainting: bool = False):
         """
         img: path file, bytes URL, Pillow/OpenCV image and data URI\n
         ocr: 'tesseract' or 'easyocr'\n
@@ -146,6 +147,11 @@ class ImageTranslator():
             self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
             self.translator = 'google'
 
+        if inpainting:
+            self.remove_text = self.__inpainting
+        else:
+            self.remove_text = self.__draw_rectangle
+
     def translate(self) -> np.ndarray:
         """Processing of the input image and
         direct translation"""
@@ -155,8 +161,7 @@ class ImageTranslator():
         self.img_out = self.img_process.copy()
         log.debug('Apply translation to image')
         for item in self.text:
-            # Draw a rectangle on the original text
-            #self.__draw_rectangle(item['word_list'], self.img_out)
+            self.remove_text(item, self.img_out)
             if item['text'] != '':
                 self.__apply_translation(item)
         return self.img_out
@@ -180,24 +185,32 @@ class ImageTranslator():
         for paragraph in paragraphs:
             self.text.append(self.__run_ocr(paragraph))
 
-        kernel = np.ones((5,5), np.uint8)
-        self.mask_paragraph = cv2.dilate(self.mask_paragraph, kernel, iterations=1)
-
-        self.img_process = cv2.inpaint(self.img, cv2.cvtColor(self.mask_paragraph,cv2.COLOR_BGR2GRAY), 3, cv2.INPAINT_NS)
-
         # Run translator
         for item in self.text:
             if item['text'] != '':
                 # Run the translator
                 item['translated_text'] = self.run_translator(
                     item['text'])
-                #self.__draw_rectangle(item['word_list'], self.img_process)
+                self.remove_text(item, self.img_process)
 
-    def __draw_rectangle(self, word: List[Word], img: np.ndarray):
+    def __draw_rectangle(self, paragraph: Paragraph, img: np.ndarray):
+        pt1 = (paragraph['x'], paragraph['y'])
+        pt2 = (paragraph['x'] + paragraph['w'], paragraph['y'] + paragraph['h'])
+        cv2.rectangle(self.img_process, pt1, pt2, (255, 255, 255), -1)
 
-        for item in word:
-            cv2.rectangle(img, (item['x1'], item['y1']), (
-                          item['x2'], item['y2']), (255, 255, 255), -1)
+    def __inpainting(self, paragraph: Paragraph, img: np.ndarray):
+        dx: int = paragraph['dx']
+        dy: int = paragraph['dy']
+        dw: int = paragraph['dw']
+        dh: int = paragraph['dh']
+
+        mask = paragraph['bin_image']
+
+        kernel = np.ones((5, 5), np.uint8)
+        temp_img = cv2.dilate(mask, kernel, iterations=1)
+        temp_img = cv2.cvtColor(temp_img, cv2.COLOR_BGR2GRAY)
+
+        cv2.inpaint(img[dy:dy + dh, dx:dx + dw], temp_img, 3, cv2.INPAINT_NS)
 
     def __detect_text(self, img: np.ndarray) -> np.ndarray:
         """
@@ -251,8 +264,8 @@ class ImageTranslator():
 
             indices = np.where(bin_image == [0])
             coordinates = tuple(zip(indices[0], indices[1]))
-            self.mask_paragraph[y:y + h, x:x + w] = cv2.cvtColor(np.invert(bin_image),
-                             cv2.COLOR_GRAY2BGR)
+            bgr_mask = cv2.cvtColor(np.invert(bin_image), cv2.COLOR_GRAY2BGR)
+            self.mask_paragraph[y:y + h, x:x + w] = bgr_mask
             # Reverse the numpy array to get RGB color and not BGR
             # Note: BGR format is the default format for opencv
             text_color = tuple(np.flip(cropped[coordinates[0]]))
@@ -262,10 +275,10 @@ class ImageTranslator():
                 'image': cropped,
                 'bin_image': bin_image,
                 'text_color': text_color,
-                'x': x,
-                'y': y,
-                'w': w,
-                'h': h
+                'dx': x,
+                'dy': y,
+                'dw': w,
+                'dh': h
             })
         return paragraph
 
@@ -286,9 +299,9 @@ class ImageTranslator():
         """
         boxes = pytesseract.image_to_data(
             paragraph['bin_image'], lang=lang_code, output_type=pytesseract.Output.DICT)
-        x: int = paragraph['x']
-        y: int = paragraph['y']
-        words: List[Word] = convert_tesserract_output(boxes, x, y)
+        dx: int = paragraph['dx']
+        dy: int = paragraph['dy']
+        words: List[Word] = convert_tesserract_output(boxes, dx, dy)
 
         x = words[0]['x1']
         y = words[0]['y1']
@@ -319,16 +332,16 @@ class ImageTranslator():
         # 4|----------------------------|3
         # [[[x1,y1],[x2,y2][x3,y3],[x4,y4],text],confidence]
 
-        x: int = paragraph['x']
-        y: int = paragraph['y']
+        dx: int = paragraph['dx']
+        dy: int = paragraph['dy']
 
         words: List[Word] = []
         for item in result:
 
             point1: tuple = item[0][0]
             point2: tuple = item[0][2]
-            x1: int = point1[0] + x
-            y1: int = point1[1] + y
+            x1: int = point1[0] + dx
+            y1: int = point1[1] + dy
             words.append({
                 'text': item[1],
                 'x1': x1 - 6,
