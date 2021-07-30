@@ -1,6 +1,14 @@
 import logging
 from image_translator.utils.lang import TRANS_LANG
-from image_translator.types import Paragraph, Word
+from image_translator.exceptions import UnknownLanguage, UnknownTranslator
+
+from image_translator.types import Paragraph
+
+# Translator
+from googletrans import Translator as Google
+from image_translator.utils.bing import Bing
+from image_translator.utils.deepl import DeepL
+
 
 TRANS = {
     'google': 0,
@@ -37,5 +45,45 @@ class Translator():
             self.src_lang = TRANS_LANG[src_lang][TRANS[self.ocr]]
             self.dest_lang = TRANS_LANG[dest_lang][TRANS[self.ocr]]
 
-    def translate(text: str) -> str:
-        return ""
+    def translate(self, paragraph: Paragraph) -> Paragraph:
+        """
+        Run translator between Google, Bing and DeepL
+        """
+        log.debug('Run translator')
+        if self.translator == 'google':
+            return self.__run_google(paragraph, self.src_lang,
+                                     self.dest_lang)
+        elif self.translator == 'bing':
+            return self.__run_bing(paragraph, self.src_lang,
+                                   self.dest_lang)
+        elif self.translator == 'deepl':
+            return self.__run_deepl(paragraph, self.src_lang,
+                                    self.dest_lang)
+
+    def _run_google(self, paragraph: Paragraph, dest_lang: str, src_lang: str) -> str:
+        """
+        Run google translator
+        """
+        tra = Google()
+
+        paragraph['translated_text'] = tra.translate(paragraph['text'], dest_lang, src_lang).text
+
+        return paragraph
+
+    def _run_bing(self, paragraph: Paragraph, dest_lang: str, src_lang: str) -> str:
+        """
+        Run bing translator
+        """
+        tra = Bing()
+        paragraph['translated_text'] = tra.translate(paragraph['text'], src_lang, dest_lang)
+
+        return paragraph
+
+    def _run_deepl(self, paragraph: Paragraph, dest_lang: str, src_lang: str) -> str:
+        """
+        Run deepl translator
+        """
+        tra = DeepL(src_lang, dest_lang)
+        paragraph['translated_text'] = tra.translate(paragraph['text'])
+
+        return paragraph
