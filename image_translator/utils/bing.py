@@ -137,7 +137,8 @@ class Bing():
         et = lxml.etree.HTML(host_html)
         lang_list = et.xpath('//*[@id="tta_srcsl"]/option/@value') or et.xpath('//*[@id="t_srcAllLang"]/option/@value')
         lang_list = list(set(lang_list))
-        lang_list.remove(self.output_auto)
+        if self.output_auto in lang_list:
+            lang_list.remove(self.output_auto)
         language_map = {}.fromkeys(lang_list, lang_list)
         iid = et.xpath('//*[@id="rich_tta"]/@data-iid')[0] + '.' + str(self.query_count + 1)
         ig = re.compile('IG:"(.*?)"').findall(host_html)[0]
