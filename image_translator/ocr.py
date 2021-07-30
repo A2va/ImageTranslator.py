@@ -3,19 +3,11 @@ import logging
 import numpy as np
 from image_translator.utils.lang import OCR_LANG
 
+from image_translator.exceptions import UnknownLanguage, UnknownOCR
 OCR = {
     'tesseract': 0,
     'easyocr': 1
 }
-
-
-class UnknownOCR(Exception):
-    pass
-
-
-class UnknownLanguage(Exception):
-    pass
-
 
 log = logging.getLogger('image_translator')
 

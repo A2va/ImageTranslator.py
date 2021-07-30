@@ -1,20 +1,12 @@
 import logging
 from image_translator.utils.lang import TRANS_LANG
+from image_translator.types import Paragraph, Word
 
 TRANS = {
     'google': 0,
     'bing': 1,
     'deepl': 2
 }
-
-
-class UnknownTranslator(Exception):
-    pass
-
-
-class UnknownLanguage(Exception):
-    pass
-
 
 log = logging.getLogger('image_translator')
 
