@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import List, Optional, Union
-from image_translator.types import Paragraph, Word
+from image_translator.types import Paragraph
 
 # Image
 import cv2
@@ -27,12 +27,12 @@ import PIL.ImageDraw as PIL_ImgDraw
 
 # OCR
 from image_translator.ocr import Ocr
+import easyocr
 from image_translator.utils.text_binarization import TextBin
 
 # Translator
 from image_translator.translator import Translator
 
-import sys
 import urllib.request
 
 # Logging
@@ -49,43 +49,6 @@ streamHandler.setFormatter(logFormatter)
 log.addHandler(streamHandler)
 
 log.setLevel(logging.DEBUG)
-
-if sys.platform == 'win32':
-    pytesseract.pytesseract.tesseract_cmd = 'tesseract-ocr/tesseract.exe'
-
-TRANS = {
-    'google': 0,
-    'bing': 1,
-    'deepl': 2
-}
-OCR = {
-    'tesseract': 0,
-    'easyocr': 1
-}
-
-
-def convert_tesserract_output(data, x: int, y: int) -> List[Word]:
-    word: List[Word] = []
-    for item in zip(data['text'], data['left'], data['top'], data['width'], data['height']):
-        if item[0] != '':
-            x1: int = item[1] + x
-            y1: int = item[2] + y
-            x2: int = item[3] + x1
-            y2: int = item[4] + y1
-            word.append({
-                'text': item[0],
-                'x1': x1 - 6,
-                'y1': y1 - 6,
-                'x2': x2 + 6,
-                'y2': y2 + 6,
-                'w': item[3] + 6,
-                'h': item[4] + 6
-            })
-    return word
-
-
-class UnknownLanguage(Exception):
-    pass
 
 
 class ImageTranslator():
