@@ -26,17 +26,13 @@ import PIL.ImageDraw as PIL_ImgDraw
 
 
 # OCR
-import easyocr
-import pytesseract
+from image_translator.ocr import Ocr
 from image_translator.utils.text_binarization import TextBin
+
 # Translator
-from googletrans import Translator
-from image_translator.utils.bing import Bing
-from image_translator.utils.deepl import DeepL
-from image_translator.utils import lang
+from image_translator.translator import Translator
 
 import sys
-
 import urllib.request
 
 # Logging
@@ -112,40 +108,10 @@ class ImageTranslator():
         self.img_process: Optional[np.ndarray] = None
         self.text: List[Paragraph] = []
         self.mask_paragraph: Optional[np.ndarray] = None
-        self.ocr: str = ocr
-        self.translator: str = translator
-        self.src_lang: str = src_lang
-        self.dest_lang: str = dest_lang
-
-        self.trans_src_lang: str = ''
-        self.trans_dest_lang: str = ''
+        self.ocr = Ocr(ocr, src_lang)
+        self.translator = Translator(translator, dest_lang, src_lang)
 
         self.gpu = gpu
-
-        # Test the language code for ocr and translator
-        try:
-            self.ocr_lang = lang.OCR_LANG[self.src_lang][OCR[self.ocr]]
-        except KeyError:
-            log.error(f'Language {self.src_lang} is not available')
-            raise UnknownLanguage(f'Language {self.src_lang} is not available')
-        if self.ocr_lang == 'invalid':
-            log.warning(f'The {self.ocr} ocr has no {self.src_lang}.'
-                        f'Switch to tesseract')
-            self.ocr = 'tesseract'
-
-        try:
-            self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS[self.translator]]
-            self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS[self.translator]]
-        except KeyError:
-            log.error(f'Language {self.dest_lang} is not available')
-            raise UnknownLanguage(
-                f'Language {self.dest_lang} is not available')
-        if src_lang == 'invalid' or dest_lang == 'invalid':
-            log.warning(f'The {self.translator} translator has no {self.src_lang}'
-                        f'or {self.dest_lang}.Switch to google')
-            self.trans_src_lang = lang.TRANS_LANG[self.src_lang][TRANS['google']]
-            self.trans_dest_lang = lang.TRANS_LANG[self.dest_lang][TRANS['google']]
-            self.translator = 'google'
 
         if inpainting:
             self.remove_text = self.__inpainting
@@ -183,14 +149,13 @@ class ImageTranslator():
 
         # Apply Binarization and ocr
         for paragraph in paragraphs:
-            self.text.append(self.__run_ocr(paragraph))
+            self.text.append(self.ocr.readtext(paragraph))
 
         # Run translator
         for item in self.text:
             if item['text'] != '':
                 # Run the translator
-                item['translated_text'] = self.run_translator(
-                    item['text'])
+                item = self.translator.translate_paragraph(item)
                 self.remove_text(item, self.img_process)
 
     def __draw_rectangle(self, paragraph: Paragraph, img: np.ndarray):
@@ -282,94 +247,6 @@ class ImageTranslator():
             })
         return paragraph
 
-    def __run_ocr(self, paragraph: Paragraph) -> Paragraph:
-        """
-        Run the selected OCR
-        """
-
-        log.debug(f'Run {self.ocr} ocr')
-        if self.ocr == 'easyocr':
-            return self.__run_easyocr(paragraph, self.ocr_lang)
-        elif self.ocr == 'tesseract':
-            return self.__run_tesserract(paragraph, self.ocr_lang)
-
-    def __run_tesserract(self, paragraph: Paragraph, lang_code: str) -> Paragraph:
-        """
-        Run tesserract ocr
-        """
-        boxes = pytesseract.image_to_data(
-            paragraph['bin_image'], lang=lang_code, output_type=pytesseract.Output.DICT)
-        dx: int = paragraph['dx']
-        dy: int = paragraph['dy']
-        words: List[Word] = convert_tesserract_output(boxes, dx, dy)
-
-        x = words[0]['x1']
-        y = words[0]['y1']
-        text: str = ''
-        for item in words:
-            text += item['text']
-            text += ' '
-
-        paragraph['x'] = x - 40
-        paragraph['y'] = y - 15
-        paragraph['word_list'] = words
-        paragraph['max_width'] = paragraph['w']
-        # Only for Cantarell -> Find a solution for all fonts
-        paragraph['font_size'] = int(words[0]['h']*1.1)
-        paragraph['text'] = text
-
-        return paragraph
-
-    def __run_easyocr(self, paragraph: Paragraph, lang_code: str) -> Paragraph:
-        """
-        Run EasyOCR
-        """
-        reader = easyocr.Reader([lang_code], gpu=self.gpu,
-                                model_storage_directory='easyocr/model')
-        result: List = reader.readtext(paragraph['bin_image'])
-        # 1|----------------------------|2
-        #  |                            |
-        # 4|----------------------------|3
-        # [[[x1,y1],[x2,y2][x3,y3],[x4,y4],text],confidence]
-
-        dx: int = paragraph['dx']
-        dy: int = paragraph['dy']
-
-        words: List[Word] = []
-        for item in result:
-
-            point1: tuple = item[0][0]
-            point2: tuple = item[0][2]
-            x1: int = point1[0] + dx
-            y1: int = point1[1] + dy
-            words.append({
-                'text': item[1],
-                'x1': x1 - 6,
-                'y1': y1 - 6,
-                'x2': point2[0] + x1 + 6,
-                'y2': point2[1] + y1 + 6,
-                'w': point2[0] - point1[0] + 6,
-                'h': point2[1] - point1[1] + 6
-                })
-
-        text: str = ''
-        for item in words:
-            text += item['text']
-            text += ' '
-
-        x = words[0]['x1']
-        y = words[0]['y1']
-
-        paragraph['x'] = x - 40
-        paragraph['y'] = y - 15
-        paragraph['word_list'] = words
-        paragraph['max_width'] = paragraph['w']
-        # Only for Cantarell -> Find a solution for all fonts
-        paragraph['font_size'] = int(words[0]['h']*1.1)
-        paragraph['text'] = text
-
-        return paragraph
-
     @staticmethod
     def reformat_input(image: Union[PIL_Img.Image, np.ndarray, str]) -> np.ndarray:
         """
@@ -425,49 +302,6 @@ class ImageTranslator():
 
                 lines.append(line)
         return lines
-
-    def run_translator(self, text: str) -> str:
-        """
-        Run translator between Google, Bing and DeepL
-        """
-        log.debug('Run translator')
-        if self.translator == 'google':
-            return self.__run_google(text, self.trans_dest_lang,
-                                     self.trans_src_lang)
-        elif self.translator == 'bing':
-            return self.__run_bing(text, self.trans_dest_lang,
-                                   self.trans_src_lang)
-        elif self.translator == 'deepl':
-            return self.__run_deepl(text, self.trans_dest_lang,
-                                    self.trans_src_lang)
-
-    def __run_google(self, text: str, dest_lang: str, src_lang: str) -> str:
-        """
-        Run google translator
-        """
-        tra = Translator()
-
-        string = tra.translate(text, dest_lang, src_lang).text
-
-        return string
-
-    def __run_bing(self, text: str, dest_lang: str, src_lang: str) -> str:
-        """
-        Run bing translator
-        """
-        tra = Bing()
-        string = tra.translate(text, src_lang, dest_lang)
-
-        return string
-
-    def __run_deepl(self, text: str, dest_lang: str, src_lang: str) -> str:
-        """
-        Run deepl translator
-        """
-        tra = DeepL(src_lang, dest_lang)
-        string = tra.translate(text)
-
-        return string
 
     def __apply_translation(self, text: Paragraph):
         """
