@@ -1,7 +1,6 @@
 import unittest
 
 from image_translator.translator import Translator
-from image_translator.utils.bing import Bing
 
 class TestTranslator(unittest.TestCase):
     '''Testing translator'''
