@@ -1,6 +1,6 @@
 import unittest
 
-from image_translator.ocr import OCR
+from image_translator.ocr import Ocr
 from easyocr.utils import reformat_input
 
 from image_translator.types import Paragraph
@@ -27,14 +27,14 @@ class TestTranslator(unittest.TestCase):
 
     def test_tesseract(self):
         '''Test tesseract ocr'''
-        ocr = OCR('tesseract', self.lang)
+        ocr = Ocr('tesseract', self.lang)
         output = ocr.readtext(self.paragraph)
 
         self.assertIn(output, self.expected_output)
 
     def test_easocr(self):
         '''Test easyocr ocr'''
-        ocr = OCR('easyocr', self.lang)
+        ocr = Ocr('easyocr', self.lang)
         output = ocr.readtext(self.paragraph)
 
         self.assertIn(output['text'], self.expected_output)

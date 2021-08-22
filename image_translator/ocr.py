@@ -44,7 +44,7 @@ def convert_tesserract_output(data, x: int, y: int) -> List[Word]:
     return word
 
 
-class OCR():
+class Ocr():
     def __init__(self, ocr: str, lang: str):
 
         # Check if ocr and language are available
