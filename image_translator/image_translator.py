@@ -278,7 +278,9 @@ class ImageTranslator():
                 'dx': x,
                 'dy': y,
                 'dw': w,
-                'dh': h
+                'w': w,
+                'dh': h,
+                'h': h
             })
         return paragraph
 
